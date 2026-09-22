@@ -124,13 +124,12 @@ export function adim(d,dt){
     if(once*s.om<0) s.gen=Math.abs(s.th);
 
     // zincir yorgunluğu — her salıncakta sıfırlanır, kalıcı yapma.
-    // Gerilim sıçraması esas olarak POMPA anından geliyor (dipte ayağa
-    // kalkmak zinciri yükler): 1.64 rad'da saf sarkaç T≈31 iken pompayla
-    // 41'e çıkıyor. İlk ayar (dayanım≈43, katsayı .05) hiç kopmuyordu —
-    // tepeden düşme (SLACK) her zaman önce geliyordu. Kalibrasyon: 2.28
-    // rad'a pompalamak ~%28, o genlikte süzülmek geçiş başına ~%40.
+    // Katsayı için bkz. CLAUDE.md §5: çubuk pompa başına değil, YÜKSEKTE
+    // GEÇİRİLEN SANİYE başına doluyor. .30 iken 2.4 rad'da 3.6 saniyede,
+    // 2.6 rad'da 1.6 saniyede kopuyordu — ormanda gereken genlik zaten
+    // 2.0-2.5 olduğu için oyuncu nişan alacak vakit bulamadan ölüyordu.
     const T=g*Math.cos(s.th)+s.L*s.om*s.om;
-    if(T>s.dayanim && !aktif(d,'zincir')) s.yorgun += (T-s.dayanim)*dt*.30/d.k.zincir;
+    if(T>s.dayanim && !aktif(d,'zincir')) s.yorgun += (T-s.dayanim)*dt*.14/d.k.zincir;
     if(s.yorgun>=1){ d.sars=1; d.px=oturX(s); d.py=oturY(s);
       const v=hizv(s); d.vx=v.x; d.vy=v.y; d.faz='dusus'; d.sebep='kopma'; return; }
     if(Math.abs(s.th)>SLACK){ d.px=oturX(s); d.py=oturY(s); d.vx=0; d.vy=0;
