@@ -1,8 +1,9 @@
 import { X, W, sakin } from '../cekirdek/tuval.js';
 import { ekr, izle, kamX, PM, olcek } from '../cekirdek/kamera.js';
-import { kis } from '../cekirdek/matematik.js';
+import { kis, renkA } from '../cekirdek/matematik.js';
 import { bolgeNo } from '../oyun/tanimlar.js';
 import { oturX, oturY, yorunge, tutunmaR, yer, ruzg } from '../oyun/fizik.js';
+import { hayalet } from '../oyun/hayalet.js';
 import { gok } from './gokyuzu.js';
 import { zemin } from './zemin.js';
 import { uzak, orta, on } from './katmanlar.js';
@@ -50,6 +51,8 @@ export function ciz(d, dt=1/60){
 
   isiklar(d,bz);     // 'lighter' — altındaki her şeyi aydınlatıyor
   paraCiz(d);        // ışıktan sonra: havuz altında kalırsa yıkanıp kayboluyor
+
+  hayaletCiz(d);     // rekor hayaleti — oyuncunun ARKASINDA, soluk
 
   // hedef halkası: bir sonraki oturağın tutunma yarıçapı
   if(d.faz==='ucus'||d.faz==='salinim'){
@@ -122,4 +125,35 @@ export function ciz(d, dt=1/60){
   // sarsıntısıyla kaymasınlar diye.
   vinyet();
   gren(d);
+}
+
+// Rekor hayaleti: kendi en iyi turunun soluk bir kopyası (oyun/hayalet.js).
+//
+// Verlet uzuv, kenar ışığı ve seri sayacı BİLEREK yok: hayalet bir rakip
+// işareti, ikinci bir karakter değil. Uzuv çizmek ayrıca uzuv.js'in
+// `d!==sonD` önbelleğini iki dünya arasında her karede sıfırlardı
+// (aynı tuzak ciz/zaman.js'in hava seçiminde de var) — hayaletin çizimi
+// oyuncunun atkısını çıldırtmamalı.
+const HAY_RENK = '#8FD8F2';
+function hayaletCiz(d){
+  const h = hayalet(); if(!h) return;
+  const alfa = (h.bitti ? kis(1-h.solma/1.1, 0, 1) : 1) * .55;
+  if(alfa <= .02) return;
+  const x = h.faz==='salinim' ? oturX(h.sal[h.i]) : h.px;
+  const y = h.faz==='salinim' ? oturY(h.sal[h.i]) : h.py;
+  if(x < kamX-W/(PM*2)-3 || x > kamX+W/(PM*2)+3) return;   // ekran dışıysa çizme
+  const q = ekr(x,y);
+  const aci = h.faz==='salinim' ? -h.sal[h.i].th : h.don;
+  X.save();
+  // Soğuk hale: figürün kendisi oyuncuyla AYNI renkte çiziliyor (aynı
+  // karakter çizimi), onu ayıran şey bu hale ve düşük alfa. Halesiz bir
+  // soluk figür "çizim hatası" gibi okunuyordu.
+  X.globalAlpha = alfa*.72;
+  const g = X.createRadialGradient(q.sx,q.sy-13,0,q.sx,q.sy-13,26);
+  g.addColorStop(0, renkA(HAY_RENK,.62)); g.addColorStop(.6, renkA(HAY_RENK,.26));
+  g.addColorStop(1, renkA(HAY_RENK,0));
+  X.fillStyle=g; X.beginPath(); X.arc(q.sx,q.sy-13,26,0,6.3); X.fill();
+  X.globalAlpha = alfa;
+  karakter(q.sx, q.sy, aci, h.faz==='salinim' && h.sal[h.i].poz==='ayakta', h.k, null);
+  X.restore();
 }

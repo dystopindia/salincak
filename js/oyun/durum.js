@@ -11,5 +11,6 @@ export const durum = {
   hal: 'menu',
   sonTohum: 'ruya',
   sonSkor: 0,
-  secKar: 0
+  secKar: 0,
+  gunlukMu: false     // son tur günün turu muydu ('Tekrar dene' bunu koruyor)
 };

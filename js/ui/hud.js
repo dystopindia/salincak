@@ -4,6 +4,7 @@ import { BOL, bolgeNo, turNo } from '../oyun/tanimlar.js';
 import { ruzg } from '../oyun/fizik.js';
 import { JOKER, aktif, jokerKullan } from '../oyun/joker.js';
 import { kayit, sahip } from '../cekirdek/kayit.js';
+import { hayalet } from '../oyun/hayalet.js';
 import { gicirtiGuncelle } from '../cekirdek/ses.js';
 import { durum } from '../oyun/durum.js';
 import { ADIMLAR, ogreticiAdim } from '../oyun/ogretici.js';
@@ -45,7 +46,24 @@ export function hudG(d){
   E.hRuz.textContent=(r>=0?'›':'‹').repeat(centik)+' '+rM.toFixed(1);
   const rRenk = rM>2.2 ? '#F2B33D' : '';
   if(rRenk!==sonRuzRenk){ E.hRuz.style.color=rRenk; sonRuzRenk=rRenk; }
-  E.hRek.textContent=kayit.rekor||'—';
+  // Günün turunda "rekor" yerine BUGÜNÜN en iyisi gösteriliyor: sabit
+  // tohumda karşılaştırılabilir olan o. Yeni bir HUD bloğu açmak yerine
+  // var olanın etiketi değişiyor (§6.8 — komşusunun yerini bozma).
+  E.hRekOlcu.textContent = d.gunluk ? 'bugün' : 'rekor';
+  E.hRek.textContent = (d.gunluk ? kayit.gunluk.enIyi : kayit.rekor) || '—';
+
+  // Hayalet farkı: kaç metre önde/gerisindesin. Hayalet yoksa boş.
+  const h = hayalet();
+  if(h){
+    const f = d.mesafe - h.mesafe;
+    // Yarım metrenin altı "başa baş": +0/−0 yazmak hem tuhaf görünüyor
+    // hem de yuvarlama yüzünden işaret sürekli gidip geliyordu.
+    E.hFark.textContent = h.bitti && h.solma>1.1 ? 'hayalet düştü'
+                        : Math.abs(f)<.5 ? 'başa baş'
+                        : (f>0?'+':'−')+Math.abs(f).toFixed(0)+' m';
+    E.hFark.style.color = h.bitti ? '#9C9AC4'
+                        : Math.abs(f)<.5 ? '#9C9AC4' : f>0 ? '#79D9AC' : '#D3506F';
+  } else if(E.hFark.textContent) E.hFark.textContent='';
 
   const k=kis(s.yorgun,0,1);
   E.hBar.style.width=(k*100)+'%';

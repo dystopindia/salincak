@@ -10,10 +10,12 @@ import { kayit, yukle } from './cekirdek/kayit.js';
 import { aktif } from './oyun/joker.js';
 import { ogreticiBittiMi } from './oyun/ogretici.js';
 import { ogreticiBitir } from './oyun/akis.js';
-import { bolgeNo } from './oyun/tanimlar.js';
+import { bolgeNo, ADIM } from './oyun/tanimlar.js';
+import { hayaletAdim } from './oyun/hayalet.js';
 import { sesiKapat, muzikAc, muzikAdim } from './cekirdek/ses.js';
 
-const ADIM = 1/240;      // fizik adımı — parametrik rezonans küçük dt istiyor
+// ADIM (fizik adımı, 1/240) oyun/tanimlar.js'te: hayalet kaydı da onu
+// zaman birimi olarak kullanıyor, tek kaynak olmalı.
 const AZAMI = .05;       // sekme sonrası dev dt'yi yut
 
 let onceki = performance.now(), bir = 0;
@@ -31,7 +33,14 @@ function dongu(su){
       // (uzuvlar ve kamera akıcı kalsın) — en kısıtlayıcı olan kazanıyor.
       const yavas = Math.min(aktif(d,'odak') ? .42 : 1, yavaslamaFaktoru(d));
       bir += dt*yavas;
-      while(bir > ADIM){ if(d.faz!=='bitti') adim(d, ADIM); bir -= ADIM; }
+      // Hayalet oyuncuyla ADIM ADIM kilitli: aynı döngüde, aynı sayıda.
+      // Gerçek saniye değil oyun zamanı karşılaştırılıyor — yavaşlatma
+      // ikisini birden etkiliyor, yani yarış dürüst kalıyor.
+      while(bir > ADIM){
+        if(d.faz!=='bitti') adim(d, ADIM);
+        hayaletAdim();
+        bir -= ADIM;
+      }
       hudG(d);
       if(d.ogretici && ogreticiBittiMi(d)) ogreticiBitir(false);
     }

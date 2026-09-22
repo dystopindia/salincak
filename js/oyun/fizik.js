@@ -60,6 +60,38 @@ export const pompaVerimi = gen =>
 
 export function bildir(d,m,c){ d.mesaj=m; d.mesajT=d.t; d.mesajRenk=c; }
 
+// --- eylemler: saf durum geçişleri -----------------------------------
+// Bunlar eskiden girdi.js'in içindeydi. Oraya AİT DEĞİLLER: girdi.js olay
+// katmanı (hangi tuş, hangi dokunuş), bu ikisi ise oyunun kuralı. Ayrılma
+// hayalet için şart oldu — geri oynatma aynı geçişi uygulamak zorunda,
+// kopyalanmış bir ikinci sürüm er ya da geç asıldan ayrışırdı ve hayalet
+// sessizce yanlış yere giderdi.
+//
+// İkisi de "işe yaradı mı" bilgisini döndürüyor: yalnız GERÇEKTEN etki
+// eden basışlar kaydediliyor (bkz. oyun/hayalet.js) — yanlış zamanda
+// basmak zaten cezasız ve etkisiz (§3), kaydı şişirmesinin anlamı yok.
+
+// Dönüş: basışın kalitesi q (0..1), etkisizse −1.
+export function pompaUygula(d){
+  if(d.faz!=='salinim') return -1;
+  const s=d.sal[d.i];
+  if(s.poz==='ayakta') return -1;
+  s.poz='ayakta'; s.pompaT=d.t;
+  return 1-Math.min(1, Math.abs(s.th)/Math.max(.2,s.gen));
+}
+
+// Sallanırken atlar, havadayken uzanır. Düşerken hiçbir şey yapmıyor.
+export function atlaUygula(d){
+  if(d.faz==='salinim'){
+    const s=d.sal[d.i], v=hizv(s);
+    d.faz='ucus'; d.px=oturX(s); d.py=oturY(s); d.vx=v.x; d.vy=v.y; d.don=0; d.uzanma=0;
+    s.poz='cokuk';
+    return true;
+  }
+  if(d.faz==='ucus'){ d.uzanma=.38; return true; }
+  return false;
+}
+
 // Şimdi atlarsan izleyeceğin yol — çizim bunu noktalı gösteriyor.
 export function yorunge(d,adet){
   const s=d.sal[d.i], v=hizv(s), g=yer(d), yol=[];
@@ -110,6 +142,11 @@ export function yakala(d){
 }
 
 export function adim(d,dt){
+  // Adım sayacı: hayalet kaydının zaman birimi bu. Gerçek saniye DEĞİL —
+  // Odak jokeri ve yakalama yavaşlaması kare başına düşen adım sayısını
+  // değiştiriyor (main.js), ama adımın kendisi hep ADIM kadar. İki turu
+  // adım sayısıyla karşılaştırmak, o yüzden tek dürüst ölçü.
+  d.adimNo++;
   d.t+=dt; d.sars=Math.max(0,d.sars-dt*3);
   if(d.uzanma>0) d.uzanma-=dt;
   jokerAdim(d,dt);

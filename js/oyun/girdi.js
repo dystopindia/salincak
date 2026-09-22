@@ -1,18 +1,23 @@
 import { durum } from './durum.js';
-import { hizv, oturX, oturY, bildir } from './fizik.js';
-import { basla, baslaTus, rastgeleTohum, ogreticiBasla, ogreticiBitir, menuyeDon, devamEt, duraklatVer, surdur } from './akis.js';
+import { bildir, pompaUygula, atlaUygula } from './fizik.js';
+import { basla, baslaTus, gunlukBasla, rastgeleTohum, ogreticiBasla, ogreticiBitir, menuyeDon, devamEt, duraklatVer, surdur } from './akis.js';
 import { pompaSesi } from '../cekirdek/ses.js';
+import { kaydet } from './hayalet.js';
 import { K } from '../cekirdek/tuval.js';
 import * as E from '../cekirdek/dom.js';
 
 // Tek eylem: BAS. Basılı tutma yok, çömelme otomatik.
 // Yanlış zamanda basmak cezalandırılmaz, sadece işe yaramaz.
+//
+// Kuralın kendisi fizik.pompaUygula'da; burada yalnız OLAY işleniyor:
+// geri bildirim yazısı, ses ve hayalet kaydı. Hayalet aynı geçişi
+// sessizce, bu katmandan hiç geçmeden uyguluyor.
 export function pompala(){
-  if(durum.hal!=='oyun' || !durum.D || durum.D.faz!=='salinim') return;
-  const d=durum.D, s=d.sal[d.i];
-  if(s.poz==='ayakta') return;
-  s.poz='ayakta'; s.pompaT=d.t; d.ogret++;
-  const q=1-Math.min(1, Math.abs(s.th)/Math.max(.2,s.gen));
+  if(durum.hal!=='oyun' || !durum.D) return;
+  const d=durum.D, q=pompaUygula(d);
+  if(q<0) return;                      // etkisiz basış: kaydedilmiyor
+  d.ogret++;
+  kaydet(d,0);
   if(q>.72)     bildir(d,'tam zamanında','#79D9AC');
   else if(q>.4) bildir(d,'idare eder','#F2B33D');
   else          bildir(d,'dipte basmalısın','#D3506F');
@@ -22,14 +27,7 @@ export function pompala(){
 // Sallanırken atlar, havadayken uzanır.
 export function atlaTus(){
   if(durum.hal!=='oyun' || !durum.D) return;
-  const d=durum.D;
-  if(d.faz==='salinim'){
-    const s=d.sal[d.i], v=hizv(s);
-    d.faz='ucus'; d.px=oturX(s); d.py=oturY(s); d.vx=v.x; d.vy=v.y; d.don=0; d.uzanma=0;
-    s.poz='cokuk';
-  } else if(d.faz==='ucus'){
-    d.uzanma=.38;
-  }
+  if(atlaUygula(durum.D)) kaydet(durum.D,1);
 }
 
 export function baglaGirdi(){
@@ -38,7 +36,7 @@ export function baglaGirdi(){
     if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); pompala(); }
     if(e.code==='KeyJ'||e.code==='ArrowRight') atlaTus();
     if(durum.hal==='son'){
-      if(e.code==='KeyR') basla(durum.sonTohum, durum.secKar);
+      if(e.code==='KeyR') basla(durum.sonTohum, durum.secKar, durum.gunlukMu);
       if(e.code==='KeyC') devamEt();
     }
     // Escape/P: oyunda duraklat, duraklattaysa sürdür. Menü/bitiş
@@ -60,14 +58,17 @@ export function baglaGirdi(){
   E.bAtla.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); atlaTus(); });
 
   E.bBasla.onclick  = baslaTus;
-  E.bTekrar.onclick = ()=> basla(durum.sonTohum, durum.secKar);
+  // "Tekrar dene" aynı tohumu yeniden kuruyor — hayalet tam da burada
+  // anlam kazanıyor. Günün turundaysan orada kalıyorsun.
+  E.bTekrar.onclick = ()=> basla(durum.sonTohum, durum.secKar, durum.gunlukMu);
   E.bMenu.onclick   = menuyeDon;
   E.bDevam.onclick  = devamEt;
   E.bDuraklat.onclick     = e=>{ e.stopPropagation(); duraklatVer(); };
   E.bSurdur.onclick       = surdur;
   E.bDuraklatMenu.onclick = menuyeDon;
   E.bOgretici.onclick     = ogreticiBasla;
+  E.bGunluk.onclick       = gunlukBasla;
   E.bOgretGec.onclick     = e=>{ e.stopPropagation(); ogreticiBitir(true); };
-  E.bOgretBasla.onclick   = ()=> basla(rastgeleTohum(), durum.secKar);
+  E.bOgretBasla.onclick   = ()=> basla(rastgeleTohum(), durum.secKar, false);
   E.bOgretMenu.onclick    = menuyeDon;
 }

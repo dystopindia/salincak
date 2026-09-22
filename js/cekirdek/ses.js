@@ -9,9 +9,17 @@
 
 let ctx = null;
 let sessiz = false;
+// Hayalet turunun sesleri duyulmamalı: aynı adım fonksiyonu geri oynatma
+// sırasında da tutunma/para/ölüm sesi tetikliyor (fizik.js sesi doğrudan
+// çağırıyor, §6.10). Tek tek çağrıları korumak yerine geri oynatmanın
+// etrafına tek bir anahtar konuyor — ileride fizik'e yeni bir ses
+// eklenirse o da kendiliğinden susuyor.
+let bastir = false;
+
+export function sesBastir(v){ bastir = v; }
 
 function baglam(){
-  if(sessiz) return null;
+  if(sessiz || bastir) return null;
   if(!ctx){
     try{ ctx = new (window.AudioContext||window.webkitAudioContext)(); }
     catch(e){ sessiz=true; return null; }

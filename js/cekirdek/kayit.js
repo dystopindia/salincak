@@ -13,9 +13,29 @@ export const kayit = {
   muzik: true,       // arka plan müziği (efektlerden ayrı kapatılabilir)
   surekli: false,    // ölünce otomatik yeniden başlasın mı (Geometry Dash tarzı)
   ogretici: false,   // öğretici bir kez tamamlandı ya da geçildi mi
+  hayaletAcik: true, // rekor hayaleti gösterilsin mi (ayarlar anahtarı)
   joker: {},        // { jokerId: adet }
-  omur: { tur:0, para:0 }
+  omur: { tur:0, para:0 },
+  // Serbest turun hayaleti: { tohum, kar, skor, mesafe, bitis, giris[] }.
+  // Tohumla birlikte saklanıyor çünkü başka bir dünyanın kaydı anlamsız
+  // (bkz. oyun/hayalet.js). Yalnız TEK slot var: son oynanan tohumun en
+  // iyisi. Geçmiş tüm tohumları biriktirmek localStorage'ı şişirirdi ve
+  // hiçbiri bir daha kurulmayacak dünyalar olurdu.
+  hayalet: null,
+  // Günün turu: tohum tarihten türüyor (oyun/gunluk.js). enIyi ve hayalet
+  // gün değişince sıfırlanıyor, seri (üst üste oynanan gün) sürüyor.
+  gunluk: { gun:'', enIyi:0, seri:0, sonGun:'', hayalet:null }
 };
+
+// Hayalet kaydının biçimi: sayı dizisi + tohum. Bozuk/eski bir kayıt
+// oyunu patlatmamalı, sessizce atılmalı — localStorage elle de düzenlenir.
+function hayaletOku(o){
+  if(!o || typeof o!=='object') return null;
+  if(typeof o.tohum!=='string' || !Array.isArray(o.giris)) return null;
+  if(!o.giris.length || !o.giris.every(v => typeof v==='number' && v>=0)) return null;
+  return { tohum:o.tohum, kar:Math.max(0,o.kar|0), skor:Math.max(0,o.skor|0),
+           mesafe:+o.mesafe||0, bitis:Math.max(0,o.bitis|0), giris:o.giris };
+}
 
 export function yukle(){
   try{
@@ -28,6 +48,15 @@ export function yukle(){
     if(typeof o.muzik === 'boolean') kayit.muzik = o.muzik;
     if(typeof o.surekli === 'boolean') kayit.surekli = o.surekli;
     if(typeof o.ogretici === 'boolean') kayit.ogretici = o.ogretici;
+    if(typeof o.hayaletAcik === 'boolean') kayit.hayaletAcik = o.hayaletAcik;
+    kayit.hayalet = hayaletOku(o.hayalet);
+    if(o.gunluk && typeof o.gunluk === 'object'){
+      kayit.gunluk.gun   = typeof o.gunluk.gun==='string' ? o.gunluk.gun : '';
+      kayit.gunluk.sonGun= typeof o.gunluk.sonGun==='string' ? o.gunluk.sonGun : '';
+      kayit.gunluk.enIyi = Math.max(0, o.gunluk.enIyi|0);
+      kayit.gunluk.seri  = Math.max(0, o.gunluk.seri|0);
+      kayit.gunluk.hayalet = hayaletOku(o.gunluk.hayalet);
+    }
     if(o.joker && typeof o.joker === 'object'){
       for(const k in o.joker) if(typeof o.joker[k]==='number') kayit.joker[k]=Math.max(0,o.joker[k]|0);
     }

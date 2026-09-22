@@ -3,6 +3,7 @@ import { KAR, BOL, bolgeNo } from '../oyun/tanimlar.js';
 import { durum } from '../oyun/durum.js';
 import { JOKER, satinAl } from '../oyun/joker.js';
 import { kayit, sahip, sakla } from '../cekirdek/kayit.js';
+import { gunTazele } from '../oyun/gunluk.js';
 import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi } from '../cekirdek/ses.js';
 
 export function goster(...ler){ ler.forEach(x=>x.classList.remove('gizli')); }
@@ -54,6 +55,12 @@ function panelAc(hedef){
 export function cuzdanTazele(){
   E.mPara.textContent = kayit.para;
   E.mRekor.textContent = kayit.rekor || '—';
+  // Gün değişmişse burada yakalanıyor: menü her açıldığında çağrılıyor,
+  // aynı günse gunTazele hemen dönüyor.
+  gunTazele();
+  const G = kayit.gunluk;
+  E.mGunluk.textContent = (G.enIyi ? 'bugünkü en iyin '+G.enIyi : 'bugün henüz oynamadın')
+    + (G.seri>1 ? ' · '+G.seri+' gün üst üste' : '');
   JOKER.forEach(j=>{
     const a = sahip(j.id);
     const et = E.dukkan.querySelector('[data-adet="'+j.id+'"]');
@@ -74,6 +81,8 @@ export function ayarlarKur(){
       b.setAttribute('aria-pressed', muzikAcikMi()?'true':'false'));
     document.querySelectorAll('[data-surekli]').forEach(b=>
       b.setAttribute('aria-pressed', kayit.surekli?'true':'false'));
+    document.querySelectorAll('[data-hayalet]').forEach(b=>
+      b.setAttribute('aria-pressed', kayit.hayaletAcik?'true':'false'));
   };
   document.querySelectorAll('[data-ses]').forEach(b=>{
     b.onclick=()=>{
@@ -91,6 +100,9 @@ export function ayarlarKur(){
   document.querySelectorAll('[data-surekli]').forEach(b=>{
     b.onclick=()=>{ kayit.surekli=!kayit.surekli; sakla(); yansit(); tikSesi(); };
   });
+  document.querySelectorAll('[data-hayalet]').forEach(b=>{
+    b.onclick=()=>{ kayit.hayaletAcik=!kayit.hayaletAcik; sakla(); yansit(); tikSesi(); };
+  });
   yansit();
 }
 
@@ -98,9 +110,14 @@ export function sonEkrani(d, canVar){
   const seb = d.sebep==='kopma'  ? 'zincir koptu'
             : d.sebep==='bosluk' ? 'tepede zincir boşaldı'
             : 'yere düştün';
-  E.sBas.textContent='skor';
+  E.sBas.textContent = d.gunluk ? 'günün turu · skor' : 'skor';
   E.sSkor.textContent=durum.sonSkor;
   E.sDok.innerHTML =
+    (d.gunluk ? '<div><span>bugünkü en iyin</span><b'+(d.gunlukRekor?' class="iyi"':'')+'>'+
+                kayit.gunluk.enIyi+'</b></div>'+
+                (kayit.gunluk.seri>1 ? '<div><span>üst üste gün</span><b>'+kayit.gunluk.seri+'</b></div>' : '')
+              : '')+
+    (d.yeniHayalet ? '<div><span>hayalet</span><b class="iyi">yeni kayıt</b></div>' : '')+
     '<div><span>salıncak</span><b>'+(d.i+1)+'</b></div>'+
     '<div><span>mesafe</span><b>'+d.mesafe.toFixed(0)+' m</b></div>'+
     '<div><span>topladığın para</span><b>'+d.para+' ◆</b></div>'+

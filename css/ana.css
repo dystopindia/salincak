@@ -15,6 +15,11 @@ canvas{display:block;width:100%;height:100%}
 .olcu{font-size:11px;letter-spacing:.05em;color:#9C9AC4;margin-bottom:1px}
 .deger{font-size:23px;font-weight:600;line-height:1.05}
 .deger small{font-size:12px;font-weight:400;color:#9C9AC4}
+/* Hayalet farkı mesafe bloğunun İÇİNDE duruyor, yeni bir HUD bloğu
+   açmıyor: §6.8'in kuralı — yeni eleman komşusunun yerini bozuyor.
+   Yüksekliği sabit, böylece hayalet yokken de blok kaymıyor. */
+.hayFark{font-size:12px;font-weight:600;line-height:14px;height:14px;
+  font-variant-numeric:tabular-nums;color:#9C9AC4}
 .blok{margin-bottom:11px}
 .zincir{position:absolute;left:calc(16px + env(safe-area-inset-left));
   bottom:calc(92px + env(safe-area-inset-bottom));width:126px}
@@ -114,6 +119,11 @@ h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
 .basla{width:100%;padding:15px;border:none;border-radius:13px;background:var(--lamba);
   color:#231903;font:inherit;font-size:16px;font-weight:700}
 .ikili{display:flex;gap:9px;margin-top:9px}
+/* Günün turu: asıl düğmenin hemen altında, ikincil ama görünür. Ayrı bir
+   ekran ya da sekme DEĞİL — tek mod ilkesi (§0) bozulmasın diye. */
+.gun{width:100%;margin-top:9px;display:block;text-align:center}
+.gun small{display:block;font-size:11px;color:#9C9AC4;margin-top:2px;
+  font-variant-numeric:tabular-nums}
 .ikinci{flex:1;padding:12px;border:1px solid rgba(233,229,242,.24);border-radius:13px;
   background:none;color:var(--ay);font:inherit;font-size:13.5px}
 .skor{font-family:Georgia,serif;font-size:clamp(50px,14vw,76px);line-height:1;color:var(--lamba)}
@@ -211,7 +221,16 @@ h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
   .jokerler button{width:40px;height:40px}
   .devam{padding:11px}
   .basla{padding:12px;font-size:15px}
-  .skor{font-size:clamp(38px,11vw,58px)} .dokum{margin:10px auto 14px;line-height:1.6}
+  .gun{margin-top:6px;padding:9px} .gun small{font-size:10px}
+  .hayFark{font-size:11px;line-height:12px;height:12px}
+  .skor{font-size:clamp(38px,11vw,58px)}
+  /* Kısa ekranda döküm İKİ SÜTUN. Tek sütunda 10 satır (günün turu üç
+     satır daha ekliyor: bugünkü en iyin, üst üste gün, hayalet) yatay
+     telefonda "Tekrar dene" düğmesini ekranın dışına itiyordu — §6.8'in
+     kuralı bitiş ekranı için de geçerli: yeni bir satır komşusunun yerini
+     hesaba katmalı. */
+  .dokum{margin:8px auto 12px;line-height:1.5;max-width:none;
+    display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
   .ikon{width:32px;height:32px;font-size:13px}
   .ayar{font-size:13px;padding:3px 4px}
 }

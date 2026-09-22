@@ -12,6 +12,8 @@ export const hSal   = el('hSal');
 export const hMes   = el('hMes');
 export const hRuz   = el('hRuz');
 export const hRek   = el('hRek');
+export const hRekOlcu = el('hRekOlcu');
+export const hFark  = el('hFark');
 export const hBar   = el('hBar');
 export const hGic   = el('hGic');
 export const hBolge = el('hBolge');
@@ -27,6 +29,8 @@ export const ogretBitti  = el('ogretBitti');
 export const bOgretBasla = el('bOgretBasla');
 export const bOgretMenu  = el('bOgretMenu');
 export const bOgretici   = el('bOgretici');
+export const bGunluk     = el('bGunluk');
+export const mGunluk     = el('mGunluk');
 
 export const kimlik = el('kimlik');
 export const dukkan  = el('dukkan');

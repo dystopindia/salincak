@@ -35,8 +35,11 @@ export function salincakGerek(d,n){
 
 export function kur(tohum,karIdx){
   const r=rng(th32(tohum)), k=KAR[karIdx];
-  const d={ tohum, r, k, faz:'salinim', i:0, sal:[],
+  const d={ tohum, r, k, karIdx, faz:'salinim', i:0, sal:[],
     skor:0, mesafe:0, enUzak:0, t:0, sars:0, ogret:0,
+    // adimNo: fizik adım sayacı, hayalet kaydının zaman birimi (§10).
+    // giris: bu turun basış kaydı; akis.basla dolduruyor, öğreticide null.
+    adimNo:0, giris:null, sonGirisAdim:0, gunluk:false, hayaletMi:false,
     para:0, jok:{}, canSayisi:0, jokerKullanildi:false, paraT:-9,
     ruzgar:(r()*2-1)*2.2, rfaz:r()*6.28,
     mesaj:'',mesajT:-9,mesajRenk:'#79D9AC', bolgeT:-9, sonBolge:-1,

@@ -22,9 +22,10 @@
     <div class="blok"><div class="olcu">para</div><div class="deger" id="hPara">0</div></div>
   </div>
   <div class="sag">
-    <div class="blok"><div class="olcu">mesafe</div><div class="deger" id="hMes">0<small> m</small></div></div>
+    <div class="blok"><div class="olcu">mesafe</div><div class="deger" id="hMes">0<small> m</small></div>
+      <div class="hayFark" id="hFark"></div></div>
     <div class="blok"><div class="olcu">rüzgâr</div><div class="deger" id="hRuz">→ 0</div></div>
-    <div class="blok"><div class="olcu">rekor</div><div class="deger" id="hRek">—</div></div>
+    <div class="blok"><div class="olcu" id="hRekOlcu">rekor</div><div class="deger" id="hRek">—</div></div>
   </div>
   <div class="jokerler" id="hJok"></div>
   <div class="zincir">
@@ -60,6 +61,7 @@
 
     <div class="kim" id="kimlik"></div>
     <button class="basla" id="bBasla">Sallanmaya başla</button>
+    <button class="ikinci gun" id="bGunluk">Günün turu<small id="mGunluk"></small></button>
 
     <div class="sekme">
       <button class="dgm" id="bDukkan" aria-pressed="false">Jokerler</button>
@@ -79,6 +81,9 @@
       <div class="ayar"><span>Sürekli oyna</span>
         <button class="anahtar" data-surekli aria-pressed="false"><span class="top"></span></button>
       </div>
+      <div class="ayar"><span>Rekor hayaleti</span>
+        <button class="anahtar" data-hayalet aria-pressed="true"><span class="top"></span></button>
+      </div>
     </div>
   </div>
 </div>
@@ -96,6 +101,9 @@
       </div>
       <div class="ayar"><span>Sürekli oyna</span>
         <button class="anahtar" data-surekli aria-pressed="false"><span class="top"></span></button>
+      </div>
+      <div class="ayar"><span>Rekor hayaleti</span>
+        <button class="anahtar" data-hayalet aria-pressed="true"><span class="top"></span></button>
       </div>
     </div>
     <button class="basla" id="bSurdur">Sürdür</button>

@@ -3,6 +3,8 @@ import { kur } from './dunya.js';
 import { ogreticiKur, ogreticiDus } from './ogretici.js';
 import { kayit, kazan, sakla, sahip } from '../cekirdek/kayit.js';
 import { canHarca } from './joker.js';
+import { hayaletBasla, hayaletTemizle, hayaletSakla } from './hayalet.js';
+import { gunTazele, gunSonuc, gunTohumu } from './gunluk.js';
 import { jokerSesi, gicirtiGuncelle, tikSesi, muzikHazirla } from '../cekirdek/ses.js';
 import * as E from '../cekirdek/dom.js';
 import { goster, gizle, sonEkrani, cuzdanTazele } from '../ui/ekranlar.js';
@@ -32,12 +34,25 @@ export function surekliIptal(){
 // d.skor'a eklenseydi her ölümde bir kez daha eklenirdi.
 export const nihaiSkor = d => d.skor + Math.round(d.mesafe*4);
 
-export function basla(tohum, karIdx){
+export function basla(tohum, karIdx, gunlukMu=false){
   surekliIptal(); muzikHazirla();
-  durum.sonTohum=tohum; durum.secKar=karIdx;
-  durum.D=kur(tohum,karIdx); durum.hal='oyun';
+  durum.sonTohum=tohum; durum.secKar=karIdx; durum.gunlukMu=gunlukMu;
+  const d=kur(tohum,karIdx);
+  // Basış kaydı burada açılıyor: kur() dünyayı kuruyor, turun "kaydediliyor
+  // olması" ise akışın kararı. Öğreticide hiç açılmıyor (ogreticiKur).
+  d.giris=[]; d.sonGirisAdim=0; d.gunluk=gunlukMu;
+  durum.D=d; durum.hal='oyun';
+  hayaletBasla(tohum, gunlukMu);      // aynı tohumun kaydı varsa yarış başlıyor
+  E.hud.classList.toggle('gunluk', gunlukMu);
   E.hud.classList.remove('ogretici');
   gizle(E.menu, E.son, E.ogretBitti); goster(E.hud);
+}
+
+// Günün turu: tohum tarihten geliyor (oyun/gunluk.js). Ayrı bir mod değil,
+// yalnız tohumu seçilmiş bir tur — kurallar birebir aynı.
+export function gunlukBasla(){
+  gunTazele();
+  basla(gunTohumu(kayit.gunluk.gun), durum.secKar, true);
 }
 
 // Menüdeki "Başla": ilk açılışta öğretici, sonra doğrudan yeni tur.
@@ -47,7 +62,7 @@ export function baslaTus(){
 }
 
 export function ogreticiBasla(){
-  surekliIptal(); muzikHazirla();
+  surekliIptal(); muzikHazirla(); hayaletTemizle();
   durum.D=ogreticiKur(durum.secKar); durum.hal='oyun';
   E.hud.classList.add('ogretici');
   gizle(E.menu, E.son, E.ogretBitti); goster(E.hud);
@@ -65,7 +80,7 @@ export function ogreticiBitir(gecildi){
 }
 
 export function menuyeDon(){
-  surekliIptal();
+  surekliIptal(); hayaletTemizle();
   durum.hal='menu';
   gizle(E.son, E.duraklat, E.ogretBitti, E.hud); goster(E.menu);
   // Bir tur oynanıp para kazanıldıktan sonra menüye dönüldüğünde cüzdan ve
@@ -102,6 +117,11 @@ export function bitir(d){
   durum.sonSkor = nihai;
   if(nihai > kayit.rekor) kayit.rekor = nihai;
 
+  // Hayalet ve günlük kayıt: ikisi de skoru bildikten SONRA, çünkü ikisi de
+  // "daha iyi mi" diye bakıyor. hayaletSakla jokerli turu kendisi eliyor.
+  d.yeniHayalet = hayaletSakla(d, nihai);
+  d.gunlukRekor = d.gunluk ? gunSonuc(nihai) : false;
+
   // Toplanan para bankaya. Can kullanılıp tur sürerse aynı paralar ikinci
   // kez yatmasın diye yalnız fark yatırılıyor.
   const fark = d.para - (d.paraYatirilan||0);
@@ -113,7 +133,7 @@ export function bitir(d){
 
   if(kayit.surekli){
     surekliIptal();
-    surekliZamanlayici = setTimeout(()=> basla(d.tohum, durum.secKar), SUREKLI_GECIKME);
+    surekliZamanlayici = setTimeout(()=> basla(d.tohum, durum.secKar, d.gunluk), SUREKLI_GECIKME);
   }
 }
 

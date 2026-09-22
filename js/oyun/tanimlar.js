@@ -46,6 +46,11 @@ export const turNo = i =>
   i < ESIK[ESIK.length-1] ? 1
   : 2 + Math.floor((i-ESIK[ESIK.length-1]) / (DONGU_BOY*(BOL.length-1)));
 
+// Fizik adımı. main.js'in yereli değil, ORTAK sabit: hayalet kaydı
+// "kaçıncı adımda basıldı" diye tutuluyor (oyun/hayalet.js), yani adım
+// büyüklüğü iki yerden birden okunuyor ve tek kaynak olmak zorunda.
+export const ADIM = 1/240;
+
 export const LFARK = .55;    // toplam ip boyu değişimi (m) — büyütme, oyun kontrolsüzleşir
 export const LHIZ0 = 1.35;   // L' üst sınırı (m/s) — ani L' pompalamayı patlatır
 export const SLACK = 2.95;   // bu açının ötesinde zincir boşalır (rad)
