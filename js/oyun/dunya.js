@@ -40,7 +40,7 @@ export function kur(tohum,karIdx){
     para:0, jok:{}, canSayisi:0, jokerKullanildi:false, paraT:-9,
     ruzgar:(r()*2-1)*2.2, rfaz:r()*6.28,
     mesaj:'',mesajT:-9,mesajRenk:'#79D9AC', bolgeT:-9, sonBolge:-1,
-    px:0,py:0,vx:0,vy:0,don:0, uzanma:0, seri:0, sebep:'' };
+    px:0,py:0,vx:0,vy:0,don:0, uzanma:0, seri:0, seriT:-9, enSeri:0, sebep:'' };
   salincakGerek(d,3);
   // İlk salıncak durgun başlamıyor. th=.18 ile tam genliğe ulaşmak 8-10
   // basış alıyordu ve ilk 25 saniye ölü zamandı. .62 ile 3-4 basış yetiyor;

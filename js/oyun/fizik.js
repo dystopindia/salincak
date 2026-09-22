@@ -3,7 +3,7 @@ import { BOL, bolgeNo, LFARK, LHIZ0, SLACK } from './tanimlar.js';
 import { salincakGerek } from './dunya.js';
 import { bitir } from './akis.js';
 import { paraTopla } from './para.js';
-import { tutunSesi, paraSesi, olumSesi } from '../cekirdek/ses.js';
+import { tutunSesi, paraSesi, olumSesi, seriSesi } from '../cekirdek/ses.js';
 import { aktif, jokerAdim } from './joker.js';
 
 // θ: düşey aşağıdan sapma. θ=0 asılı duruş.
@@ -87,7 +87,14 @@ export function yakala(d){
       const atlanan=j-d.i-1;
       let c = d.uzanma>0 ? 1.6 : 1;
       if(atlanan>0) c*=1.9+atlanan*.6;
-      d.seri = (d.uzanma>0) ? d.seri+1 : 0;
+      // Seri: ardışık HARİKA geçişler. Harika = uzanarak yakalamak (havada
+      // bilinçli ikinci dokunuş) ya da bir salıncağı atlayıp öteye tutunmak.
+      // Düz tutunma seriyi sıfırlıyor — seri "yaptım" değil "üst üste
+      // yaptım" demek. Skor çarpanı zaten buna bağlıydı (§8), yeni olan
+      // görünür olması: ciz/seri.js alevli sayacı çiziyor.
+      const harika = d.uzanma>0 || atlanan>0;
+      d.seri = harika ? d.seri+1 : 0;
+      if(harika){ d.seriT=d.t; d.enSeri=Math.max(d.enSeri||0, d.seri); }
       c *= 1+Math.min(.8,d.seri*.12);
       d.skor += Math.round((s.x-d.sal[d.i].x)*12*c);
       d.i=j; d.faz='salinim'; salincakGerek(d,d.i+3);
@@ -95,6 +102,7 @@ export function yakala(d){
         d.uzanma>0 ? 'uzanarak yakaladın ×'+c.toFixed(1) : 'tutundun',
         atlanan>0?'#F2B33D':d.uzanma>0?'#79D9AC':'#E9E5F2');
       tutunSesi(atlanan>0 || d.uzanma>0);
+      if(harika && d.seri>1) seriSesi(d.seri);
       return true;
     }
   }

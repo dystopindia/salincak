@@ -104,6 +104,7 @@ export function sonEkrani(d, canVar){
     '<div><span>salıncak</span><b>'+(d.i+1)+'</b></div>'+
     '<div><span>mesafe</span><b>'+d.mesafe.toFixed(0)+' m</b></div>'+
     '<div><span>topladığın para</span><b>'+d.para+' ◆</b></div>'+
+    (d.enSeri>1 ? '<div><span>en uzun seri</span><b class="iyi">×'+d.enSeri+'</b></div>' : '')+
     '<div><span>ulaştığın bölge</span><b>'+BOL[bolgeNo(d.i)].ad+'</b></div>'+
     '<div><span>'+seb+'</span><b class="kotu">son</b></div>'+
     (d.jokerKullanildi

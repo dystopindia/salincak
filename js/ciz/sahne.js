@@ -11,6 +11,7 @@ import { karakter } from './karakter.js';
 import { isiklar, kenarIsik } from './isik.js';
 import { uzuv } from './uzuv.js';
 import { paraCiz, paraPop } from './para.js';
+import { seriCiz } from './seri.js';
 import { parcaciklarCiz } from './zaman.js';
 import { vinyet, gren } from './rotus.js';
 
@@ -97,6 +98,8 @@ export function ciz(d, dt=1/60){
     karakter(q.sx,q.sy,d.don,true,d.k,kenarIsik(d,p.x,p.y));
     uzuv(d,dt,q.sx,q.sy,d.don,yer(d),ruzg(d));
   }
+
+  { const o=ekr(p.x,p.y); seriCiz(d,o.sx,o.sy); }   // alevli seri sayacı
 
   // uçuşan geri bildirim yazısı
   const yas=d.t-d.mesajT;

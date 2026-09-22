@@ -73,6 +73,18 @@ export function jokerSesi(){
   ton(c, 750, .13, 'sine', .09, .06);
 }
 
+// Seri: her harika geçişte bir basamak yukarı çıkan iki nota. Perde
+// seriyle tırmanıyor (majör pentatonik basamakları, 8'de duruyor) —
+// kulakla da "üst üste yapıyorum" duygusu.
+const SERI_PERDE = [0,2,4,7,9,12,14,16];
+export function seriSesi(n){
+  const c=baglam(); if(!c) return;
+  const y = SERI_PERDE[Math.min(n-1, SERI_PERDE.length-1)];
+  const f = 523.25*Math.pow(2,y/12);
+  ton(c, f,   .07, 'triangle', .07, 0);
+  ton(c, f*1.5, .12, 'sine',    .06, .05);
+}
+
 // Menü tıklaması: çok kısa, çok kısık — dikkat çekmesin.
 export function tikSesi(){
   const c=baglam(); if(!c) return;
