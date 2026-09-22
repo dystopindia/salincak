@@ -32,10 +32,16 @@ canvas{display:block;width:100%;height:100%}
 .bolge b::before{right:100%} .bolge b::after{left:100%;transform:scaleX(-1)}
 .bolge i{display:block;margin-top:9px;font-size:13.5px;font-style:normal;letter-spacing:.06em;color:#B9B6DA}
 
-.atla{position:absolute;right:calc(16px + env(safe-area-inset-right));
-  bottom:calc(22px + env(safe-area-inset-bottom));pointer-events:auto;
+.atla{position:absolute;right:calc(20px + env(safe-area-inset-right));
+  bottom:calc(28px + env(safe-area-inset-bottom));pointer-events:auto;
   width:106px;height:106px;border-radius:50%;border:1px solid rgba(233,229,242,.25);
   background:rgba(20,22,56,.6);color:var(--ay);font:inherit;font-size:15px;font-weight:700}
+/* Görünmez dokunma payı: daireyi ıskalayan bir parmak yine ATLAR. Iskalayan
+   dokunuş tuvale gidiyordu, tuval de pompalıyor — yani ıskalamanın bedeli
+   istenmeyen bir pompa, çoğu zaman da kopan bir zincirdi. Sözde eleman
+   düğmenin bir parçası sayıldığı için görüntüyü hiç büyütmeden vuruş
+   alanını büyütüyor. */
+.atla::before{content:"";position:absolute;inset:-16px;border-radius:50%}
 .atla:active{background:rgba(242,179,61,.25);border-color:var(--lamba)}
 .atla span{display:block;font-size:10px;font-weight:400;color:#9C9AC4;margin-top:2px}
 .ipucu{position:absolute;left:0;right:0;bottom:calc(32px + env(safe-area-inset-bottom));text-align:center;
@@ -175,7 +181,12 @@ h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
 @media (max-height:540px){
   .deger{font-size:18px} .deger small{font-size:10px} .blok{margin-bottom:6px}
   .olcu{font-size:10px}
-  .atla{width:82px;height:82px;font-size:14px}
+  /* Yatay telefonda düğme köşede kalınca başparmak uzanamıyor: iki elle
+     tutarken rahat bölge kenardan ~30-40 px içeride. Küçülen ekranda
+     dikeyde de yukarı alınıyor. */
+  .atla{width:88px;height:88px;font-size:14px;
+    right:calc(32px + env(safe-area-inset-right));
+    bottom:calc(36px + env(safe-area-inset-bottom))}
   .zincir{bottom:calc(62px + env(safe-area-inset-bottom));width:100px}
   .ipucu{bottom:calc(14px + env(safe-area-inset-bottom));font-size:12px}
   .ogret{bottom:calc(12px + env(safe-area-inset-bottom));font-size:13px;padding:8px 13px}
