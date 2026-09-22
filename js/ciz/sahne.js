@@ -12,6 +12,7 @@ import { isiklar, kenarIsik } from './isik.js';
 import { uzuv } from './uzuv.js';
 import { paraCiz, paraPop } from './para.js';
 import { seriCiz } from './seri.js';
+import { ruzgarCiz } from './ruzgar.js';
 import { parcaciklarCiz } from './zaman.js';
 import { vinyet, gren } from './rotus.js';
 
@@ -112,6 +113,7 @@ export function ciz(d, dt=1/60){
   }
   { const o=ekr(p.x,p.y); paraPop(d,o.sx,o.sy); }
 
+  ruzgarCiz(d);       // rüzgâr çizgileri: ön plandan önce, oyun düzleminin üstünde
   on(d,bz);          // ön plan karakterin de üstünde
   parcaciklarCiz(d);  // kar/yaprak/taç yaprağı — her şeyin en önünde süzülüyor
   X.restore();

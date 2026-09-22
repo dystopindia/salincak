@@ -2,7 +2,7 @@ import { X, W, H } from '../cekirdek/tuval.js';
 import { kamX, PM } from '../cekirdek/kamera.js';
 import { nz, lerp, kis, renkKar, parlaklik } from '../cekirdek/matematik.js';
 import { BOL, bolgeNo } from '../oyun/tanimlar.js';
-import { oturX } from '../oyun/fizik.js';
+import { oturX, ruzg } from '../oyun/fizik.js';
 
 // Gündüz-gece ve hava, tamamen bu dosyada — oyun/ hiç haberi yok, hiçbir
 // yeni alan eklemedi. Yalnız BOYAMA, dünya üretimini etkilemiyor.
@@ -113,24 +113,34 @@ export function parcaciklarCiz(d){
   const { parcacik:p } = mevsimGoster(d);
   if(!p) return;
   const N = Math.round(46*p.yogunluk);
+  // Kar/yaprak/yağmur RÜZGÂRLA sürükleniyor. Eskiden hepsi dümdüz aşağı
+  // düşüyordu; ekranda esen bir rüzgâr varken düşey düşen kar, rüzgârın
+  // olmadığını söylüyordu. Sürüklenme yatayda da sarmalanmalı (mod),
+  // yoksa parçacıklar birkaç saniyede ekrandan çıkıp geri gelmiyor.
+  const r = ruzg(d), kay = r*PM*2.6*d.t;
+  const sar = W+120;
+  const yatay = i => ((((nz(i*3.7)*sar + kay) % sar) + sar) % sar) - 60;
   X.globalAlpha=1;
   if(p.sekil==='cizgi'){                        // yağmur: hızlı, ince çizgiler
     X.strokeStyle=p.renk; X.lineCap='round'; X.lineWidth=p.kalinlik||1.2;
     const uzunluk=p.boy*PM;
+    // Damlanın izi hareketinin yönünde yatıyor: rüzgâr sağa eserken alt uç
+    // sağda. Eğik yağmur, rüzgârı anlatan en kestirme işaret.
+    const egim = kis(-.22 + r*.34, -1.4, 1.4);
     for(let i=0;i<N;i++){
-      const sx=nz(i*3.7)*(W+60)-30+Math.sin(d.t*.3+i*1.7)*6;
+      const sx=yatay(i)+Math.sin(d.t*.3+i*1.7)*6;
       const sy=((nz(i*5.1+11)*(H+80)+d.t*p.hiz*PM*22)%(H+80))-40;
       X.globalAlpha=.20+nz(i*1.3)*.28;
-      X.beginPath(); X.moveTo(sx,sy); X.lineTo(sx-uzunluk*.22,sy+uzunluk); X.stroke();
+      X.beginPath(); X.moveTo(sx,sy); X.lineTo(sx+uzunluk*egim,sy+uzunluk); X.stroke();
     }
   } else {                                       // kar/yaprak/çiçek: düşen daireler
     X.fillStyle=p.renk;
     for(let i=0;i<N;i++){
-      const sx=nz(i*3.7)*(W+60)-30+Math.sin(d.t*.5+i*1.7)*16;
+      const sx=yatay(i)+Math.sin(d.t*.5+i*1.7)*16;
       const sy=((nz(i*5.1+11)*(H+80)+d.t*p.hiz*PM*22)%(H+80))-40;
-      const r=p.boy*PM*(.55+nz(i*2.3)*.9);
+      const r2=p.boy*PM*(.55+nz(i*2.3)*.9);
       X.globalAlpha=.28+nz(i*1.3)*.4;
-      X.beginPath(); X.arc(sx,sy,r*.5,0,6.3); X.fill();
+      X.beginPath(); X.arc(sx,sy,r2*.5,0,6.3); X.fill();
     }
   }
   X.globalAlpha=1;

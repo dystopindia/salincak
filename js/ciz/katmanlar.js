@@ -1,7 +1,8 @@
 import { X, W, H } from '../cekirdek/tuval.js';
 import { ekrK, kamX, KATMAN, PM } from '../cekirdek/kamera.js';
-import { nz, renkKar, renkA, parlaklik } from '../cekirdek/matematik.js';
+import { nz, kis, renkKar, renkA, parlaklik } from '../cekirdek/matematik.js';
 import { BOL } from '../oyun/tanimlar.js';
+import { ruzg } from '../oyun/fizik.js';
 import { mevsimGoster, mevsimBoya, gunEvresi } from './zaman.js';
 
 // Atmosferik perspektif iki eksende: zemin→ufuk sis karışımı + parlaklık.
@@ -351,25 +352,37 @@ export function on(d,b){
   const {sol,sag}=pencere(k,adim);
   X.fillStyle=mevsimBoya(BOL[b].on,mevsim);
 
+  // Ön plan rüzgârı gösteren ikinci işaret (birincisi ciz/ruzgar.js):
+  // otlar rüzgârın yönüne yatıyor, iplikler o yöne savruluyor. Aynı
+  // `ruzg(d)` değerinden geliyor — çizgilerle hep aynı yöne bakıyorlar.
+  const ruz=ruzg(d), siddet=Math.min(1,Math.abs(ruz)/2.2);
+
   if(b>=2){                                 // savrulan iplikler (bulutlar ve ötesi)
     X.strokeStyle=BOL[b].on; X.globalAlpha=.55; X.lineWidth=2.5; X.lineCap='round';
+    const yonu=ruz>=0?1:-1;
     for(let x=sol;x<=sag;x+=adim*2.5){
       const i=Math.round(x/adim)+7;
       if(nz(i*5.1)<.4) continue;
       const a=ekrK(x,ON_TABAN+.5+nz(i)*1.1,k);
+      const boy=(20+nz(i*2)*46)*(.45+.75*siddet);
       X.beginPath(); X.moveTo(a.sx,a.sy);
-      X.lineTo(a.sx+30+nz(i*2)*46,a.sy+7+nz(i*3)*12); X.stroke();
+      X.lineTo(a.sx+yonu*boy,a.sy+7+nz(i*3)*12); X.stroke();
     }
     X.globalAlpha=1; return;
   }
 
   X.globalAlpha=.94;
+  const egim=kis(ruz*.15,-.62,.62);
   for(let x=sol;x<=sag;x+=adim){             // ot tutamları — %55'i çiziliyor
     const i=Math.round(x/adim)+21;
     if(nz(i*5.1)<.45) continue;
     for(let j=0;j<3;j++){
       const n=nz(i*7+j*13);
-      const h=.7+n*.8, e=(nz(i*2.4+j*5)-.5)*.55, kx=x+(j-1)*.16;
+      // Yatma boyla çarpılıyor: uzun ot daha çok eğiliyor, dipten değil
+      // uçtan bükülüyor. Salınım rüzgâr şiddetiyle orantılı — durgun
+      // havada ot kıpırdamıyor.
+      const salin=Math.sin(d.t*2.1+i*.7+j)*.07*siddet;
+      const h=.7+n*.8, e=(nz(i*2.4+j*5)-.5)*.55+(egim+salin)*h, kx=x+(j-1)*.16;
       const a=ekrK(kx-.1,ON_TABAN,k), t=ekrK(kx+e,ON_TABAN+h,k), c=ekrK(kx+.1,ON_TABAN,k);
       X.beginPath(); X.moveTo(a.sx,a.sy);
       X.quadraticCurveTo((a.sx+t.sx)/2-3,(a.sy+t.sy)/2,t.sx,t.sy);

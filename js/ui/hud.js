@@ -10,6 +10,7 @@ import { ADIMLAR, ogreticiAdim } from '../oyun/ogretici.js';
 
 const SURELI = JOKER.filter(j => j.sure);
 let dugme = null;
+let sonRuzRenk = null;   // renk her karede değil, yalnız değişince yazılıyor
 
 // Tur içi joker çubuğu bir kez kuruluyor; her karede yalnız durumu tazeleniyor.
 function jokerKur(){
@@ -35,8 +36,15 @@ export function hudG(d){
   E.hPara.textContent=d.para;
   E.hMes.innerHTML=d.mesafe.toFixed(0)+'<small> m</small>';
 
-  const r=ruzg(d);
-  E.hRuz.textContent=(r>=0?'→ ':'← ')+Math.abs(r).toFixed(1);
+  // Rüzgâr okunması gereken bir sayı değil, bir his: asıl gösterge artık
+  // ekrandaki çizgiler (ciz/ruzgar.js). Buradaki satır onların ÖZETİ —
+  // şiddet kaç çentikle ve sert rüzgârda renkle veriliyor, çünkü tek
+  // ondalık sayıyı kimse uçarken okumuyordu.
+  const r=ruzg(d), rM=Math.abs(r);
+  const centik = rM>2.2 ? 3 : rM>1.2 ? 2 : 1;
+  E.hRuz.textContent=(r>=0?'›':'‹').repeat(centik)+' '+rM.toFixed(1);
+  const rRenk = rM>2.2 ? '#F2B33D' : '';
+  if(rRenk!==sonRuzRenk){ E.hRuz.style.color=rRenk; sonRuzRenk=rRenk; }
   E.hRek.textContent=kayit.rekor||'—';
 
   const k=kis(s.yorgun,0,1);
