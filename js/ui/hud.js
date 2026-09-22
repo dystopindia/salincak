@@ -1,6 +1,6 @@
 import * as E from '../cekirdek/dom.js';
 import { kis } from '../cekirdek/matematik.js';
-import { BOL, bolgeNo } from '../oyun/tanimlar.js';
+import { BOL, bolgeNo, turNo } from '../oyun/tanimlar.js';
 import { ruzg } from '../oyun/fizik.js';
 import { JOKER, aktif, jokerKullan } from '../oyun/joker.js';
 import { kayit, sahip } from '../cekirdek/kayit.js';
@@ -71,8 +71,12 @@ export function hudG(d){
   const b=bolgeNo(d.i);
   if(b!==d.sonBolge){
     d.sonBolge=b; d.bolgeT=d.t;
-    const B=BOL[b];
-    E.hBolge.innerHTML='<small>'+B.no+'</small><b>'+B.ad+'</b><i>'+B.not+'</i>';
+    const B=BOL[b], tur=turNo(d.i);
+    // Bölgeler yörüngeden sonra döngüye giriyor (tanimlar.bolgeNo); kart
+    // "II · orman"ı ikinci kez gösterdiğinde bunun hata değil tur olduğu
+    // anlaşılsın diye tur numarası ekleniyor.
+    E.hBolge.innerHTML='<small>'+B.no+(tur>1?' · '+tur+'. TUR':'')+'</small>'+
+      '<b>'+B.ad+'</b><i>'+B.not+'</i>';
   }
   const y=d.t-d.bolgeT;
   E.hBolge.style.opacity = y<3 ? (y<.5 ? y/.5 : kis((3-y)/.9,0,1)) : 0;

@@ -171,6 +171,66 @@ function kuslar(k,t,renk){
   }
 }
 
+// Sivri buz sırtı (buz kuşağı, uzak): kırık kristal siluet.
+function buzSirti(k,adim,taban,yuk,kay){
+  const {sol,sag}=pencere(k,adim); ac();
+  for(let x=sol;x<=sag;x+=adim){
+    const i=Math.round(x/adim)+kay;
+    const h=yuk*(.30+.70*nz(i)), e=adim*(.30+.25*nz(i*2.7));
+    const a=ekrK(x-adim*.5,taban,k), t=ekrK(x+e,taban+h,k), b=ekrK(x+adim*.5,taban+h*.22,k);
+    X.lineTo(a.sx,a.sy); X.lineTo(t.sx,t.sy); X.lineTo(b.sx,b.sy);
+  }
+  kapat();
+}
+
+// Kuyruklu yıldızlar: çekirdek + arkaya uzanan sönen kuyruk. Düzlem
+// boyunca TEKRARLIYOR — ilk sürümde tek bir tane sabit noktadaydı ve
+// k=.06'lık düzlemde oyuncu ona hiç denk gelmiyordu (bölge 70 m sürüyor,
+// düzlemde yalnız ~4 m). Katman silüetlerindeki hücre mantığının aynısı.
+function kuyrukluYildizlar(k,t,renk){
+  const adim=7, {sol,sag}=pencere(k,adim);
+  for(let x=sol;x<=sag;x+=adim){
+    const i=Math.round(x/adim)+87;
+    if(nz(i*4.1)<.55) continue;
+    kuyrukluYildiz(k, x+nz(i)*4, 4.2+nz(i*1.9)*2.4, t, renk);
+  }
+}
+
+function kuyrukluYildiz(k,cx,cy,t,renk){
+  const p=ekrK(cx,cy,k), R=PM*.10;
+  if(p.sx<-260||p.sx>W+120) return;
+  X.globalCompositeOperation='lighter';
+  for(let i=1;i<=18;i++){                     // kuyruk: sağa-yukarı incelerek
+    const u=i/18, q=ekrK(cx+u*2.6, cy+u*.8+Math.sin(t*.4+i*.3)*.04, k);
+    X.fillStyle=renkA(renk,.10*(1-u));
+    X.beginPath(); X.arc(q.sx,q.sy,R*(1.2-u*.9),0,6.3); X.fill();
+  }
+  const g=X.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,R*3.2);
+  g.addColorStop(0,renkA(renk,.42)); g.addColorStop(1,renkA(renk,0));
+  X.fillStyle=g; X.beginPath(); X.arc(p.sx,p.sy,R*3.2,0,6.3); X.fill();
+  X.globalCompositeOperation='source-over';
+  X.fillStyle='#EAFBFF'; X.beginPath(); X.arc(p.sx,p.sy,R*.55,0,6.3); X.fill();
+}
+
+// Dönen buz kütleleri (buz kuşağı, orta düzlem): köşeli, aydınlık —
+// yörüngedeki enkazla aynı disiplin, siyah gökte koyu silüet okunmuyor.
+function buzKutleleri(k,t,renk){
+  const adim=3.6, {sol,sag}=pencere(k,adim);
+  X.fillStyle=renk; X.strokeStyle=renkA('#EAFBFF',.5); X.lineWidth=1;
+  for(let x=sol;x<=sag;x+=adim){
+    const i=Math.round(x/adim)+41;
+    if(nz(i*2.3)<.3) continue;
+    const p=ekrK(x+nz(i)*2, 1.1+nz(i*1.7)*6.2, k), r=PM*(.10+nz(i*3.1)*.22), a=t*.25+i;
+    X.beginPath();
+    for(let j=0;j<5;j++){
+      const ac2=a+j*1.257, rr=r*(.62+nz(i+j)*.55);
+      const px=p.sx+Math.cos(ac2)*rr, py=p.sy+Math.sin(ac2)*rr;
+      j?X.lineTo(px,py):X.moveTo(px,py);
+    }
+    X.closePath(); X.fill(); X.stroke();
+  }
+}
+
 // Uydu (yörünge, orta düzlem): gövde + iki panel, ağır ağır dönüyor.
 function uydu(k,x,y,t,renk){
   const p=ekrK(x,y,k), s=PM*.22;
@@ -207,6 +267,19 @@ export function uzak(d,b){
     X.fillStyle=enUzak; kume(K_ENUZAK,4.2,3.4,2.4,700);
     kuslar(.11,d.t,renkA('#0D0820',.6));
     X.fillStyle=uzakR; kume(k,3.4,1.9,2.6,260);
+  }
+  else if(b===4){                          // buz kuşağı: kuyruklu yıldız + buz sırtı
+    X.globalCompositeOperation='lighter';
+    for(const [x,y,r,renk,a] of [[6,5.8,6,'#2B6F8F',.26],[-4,6.6,4.5,'#3D7F8F',.18]]){
+      const p=ekrK(x,y,.05), R=r*PM;
+      const gg=X.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,R);
+      gg.addColorStop(0,renkA(renk,a*gece)); gg.addColorStop(1,renkA(renk,0));
+      X.fillStyle=gg; X.beginPath(); X.arc(p.sx,p.sy,R,0,6.3); X.fill();
+    }
+    X.globalCompositeOperation='source-over';
+    kuyrukluYildizlar(.06,d.t,B.lamba);
+    X.fillStyle=enUzak; buzSirti(K_ENUZAK,3.0,2.2,3.2,1300);
+    X.fillStyle=uzakR;  buzSirti(k,2.4,1.5,3.6,420);
   }
   else {                                   // yörünge: nebula, uzak ay, gezegen kavsi + atmosfer
     X.globalCompositeOperation='lighter';
@@ -247,6 +320,7 @@ export function orta(d,b){
     atesbocekleri(k,d.t,1-gunGuc,'#D8F07A');
   }
   else if(b===2) kume(k,2.4,.7,1.7,310);
+  else if(b===4) buzKutleleri(k,d.t,renkA('#BFE6F0',.55));
   else {                                   // yörünge: sürüklenen enkaz + uydular
     // Siyah gökte koyu silüet okunmuyor (enkaz ilk sürümden beri görünmezdi);
     // burada nesneler aydınlık, gök koyu.
@@ -277,7 +351,7 @@ export function on(d,b){
   const {sol,sag}=pencere(k,adim);
   X.fillStyle=mevsimBoya(BOL[b].on,mevsim);
 
-  if(b===2||b===3){                         // savrulan iplikler
+  if(b>=2){                                 // savrulan iplikler (bulutlar ve ötesi)
     X.strokeStyle=BOL[b].on; X.globalAlpha=.55; X.lineWidth=2.5; X.lineCap='round';
     for(let x=sol;x<=sag;x+=adim*2.5){
       const i=Math.round(x/adim)+7;

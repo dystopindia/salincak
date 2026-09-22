@@ -44,6 +44,13 @@ export function zemin(d,b){
       X.beginPath(); X.ellipse(p.sx,p.sy,70,17,0,0,6.3); X.fill();
     }
   }
+  if(b===4){ // buz kuşağı: zeminde parlayan kırıntılar
+    for(let i=0;i<26;i++){
+      const wx=Math.floor(kamX/4)*4+(i-13)*3.1, p=ekr(wx+ (i%3)*.7, .06+(i%4)*.05);
+      X.fillStyle='rgba(200,240,250,'+(.06+(i%5)*.03)+')';
+      X.beginPath(); X.ellipse(p.sx,p.sy,10+(i%4)*7,2.5,0,0,6.3); X.fill();
+    }
+  }
   if(b===3){ // yörünge: kaçış çizgileri
     X.strokeStyle='rgba(233,229,242,.09)'; X.lineWidth=1;
     for(let i=0;i<20;i++){

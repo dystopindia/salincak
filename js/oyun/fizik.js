@@ -43,6 +43,21 @@ export function yavaslamaFaktoru(d){
   return lerp(YAVAS_TABAN, 1, eta/YAVAS_ESIK);
 }
 
+// Pompa verimi: yüksek genlikte pompa daha az iş yapıyor.
+//
+// Sebep fizikte: E = mgL(1−cosA), yani dA/dE = 1/(mgL·sinA) ve A tepeye
+// yaklaşırken sinA→0 — AYNI enerji artışı orada çok daha büyük bir açı
+// sıçraması veriyor. Sabit LFARK ile merdiven 1.32 → 1.74 → 2.56 gidiyordu:
+// son basamak 0.82 rad. Oyuncu 2.1 isteyip 2.56'ya fırlıyor, bazen de
+// SLACK'i (2.95) aşıp tepeden düşüyordu — ara değer seçmek imkânsızdı.
+// Verim eğrisiyle basamaklar ~0.3-0.4'e iniyor: 1.63 → 1.99 → 2.34 → 2.75.
+//
+// LFARK'a DOKUNMUYOR (§2): düşük genlikte verim 1, yani turun başındaki
+// tempo (3-4 basışta havalanma) aynı kalıyor.
+const POMPA_TAM = 1.0, POMPA_KISIK = 2.2, POMPA_TABAN = .35;
+export const pompaVerimi = gen =>
+  gen<=POMPA_TAM ? 1 : lerp(1, POMPA_TABAN, kis((gen-POMPA_TAM)/(POMPA_KISIK-POMPA_TAM),0,1));
+
 export function bildir(d,m,c){ d.mesaj=m; d.mesajT=d.t; d.mesajRenk=c; }
 
 // Şimdi atlarsan izleyeceğin yol — çizim bunu noktalı gösteriyor.
@@ -113,7 +128,7 @@ export function adim(d,dt){
     if(s.poz==='ayakta' && (Math.abs(s.om)<.30||d.t-s.pompaT>1.4) && d.t-s.pompaT>.25) s.poz='cokuk';
 
     // L' ASLA ani olmamalı — yumuşak yaklaşma. (hedef-L)/dt yazarsan oyun patlar.
-    const gezi=LFARK*d.k.pompa, hedef = s.poz==='ayakta' ? s.Lu-gezi : s.Lu;
+    const gezi=LFARK*d.k.pompa*pompaVerimi(s.gen), hedef = s.poz==='ayakta' ? s.Lu-gezi : s.Lu;
     s.Ld = kis((hedef-s.L)*6.5, -LHIZ0*d.k.pompa, LHIZ0*d.k.pompa);
     s.L  = kis(s.L+s.Ld*dt, s.Lu-gezi, s.Lu);
 

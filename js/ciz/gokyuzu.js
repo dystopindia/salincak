@@ -18,7 +18,7 @@ export function gok(d,karisim,b1,b2){
   const { gunGuc } = gunEvresi(d, BOL[bDerin].gunEtki);
 
   // yıldızlar: bulutlar bölgesinden itibaren, gündüz söner
-  const a=kis((bDerin-1)/2,0,1)*.85*(1-gunGuc);
+  const a=kis((bDerin-1)/2,0,1)*.85*(1-gunGuc);   // b>=3 → tam yoğunluk
   if(a>0){
     X.fillStyle='#E9E5F2';
     for(let i=0;i<70;i++){

@@ -121,6 +121,8 @@ const MUZIK = [
     cumle:[0,2,6,7, 11,7,6,2, 0,2,6,9, 7,6,2,null] },
   { kok:146.83, adim:.72, tini:'sine',     suzgec:900,           // yörünge: seyrek, derin
     cumle:[0,null,7,null, 10,null,7,null, 3,null,5,null, 0,null,null,null] },
+  { kok:174.61, adim:.64, tini:'sine',     suzgec:1300,          // buz kuşağı: soğuk, çınlayan
+    cumle:[0,7,null,12, 10,null,7,null, 5,12,null,10, 7,null,3,null] },
 ];
 const MUZIK_BUS = .55;
 
