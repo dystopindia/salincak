@@ -1,0 +1,119 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Salıncak</title>
+<meta name="theme-color" content="#0E1230">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Salıncak">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="ikon/ikon-192.png">
+<link rel="apple-touch-icon" href="ikon/apple-180.png">
+<link rel="stylesheet" href="css/ana.css">
+
+<canvas id="c"></canvas>
+<div class="cevir" id="cevir">telefonu yan çevir · oyun geniş ekranda</div>
+
+<div class="hud gizli" id="hud">
+  <div class="sol">
+    <div class="blok"><div class="olcu">skor</div><div class="deger" id="hSkor">0</div></div>
+    <div class="blok"><div class="olcu">salıncak</div><div class="deger" id="hSal">1</div></div>
+    <div class="blok"><div class="olcu">para</div><div class="deger" id="hPara">0</div></div>
+  </div>
+  <div class="sag">
+    <div class="blok"><div class="olcu">mesafe</div><div class="deger" id="hMes">0<small> m</small></div></div>
+    <div class="blok"><div class="olcu">rüzgâr</div><div class="deger" id="hRuz">→ 0</div></div>
+    <div class="blok"><div class="olcu">rekor</div><div class="deger" id="hRek">—</div></div>
+  </div>
+  <div class="jokerler" id="hJok"></div>
+  <div class="zincir">
+    <div class="olcu">zincir</div><div class="bar"><i id="hBar"></i></div>
+    <div class="gic" id="hGic">gıcırdıyor</div>
+  </div>
+  <div class="bolge" id="hBolge"></div>
+  <div class="ipucu" id="hIp">yeşil bölgeden geçerken bas</div>
+  <div class="ogret" id="hOgret"><b id="hOgretNo">1/5</b><span id="hOgretMetin"></span></div>
+  <button class="ikon ogretGec" id="bOgretGec">öğreticiyi geç</button>
+  <button class="ikon duraklatIkon" id="bDuraklat" aria-label="Duraklat" title="Duraklat">⏸</button>
+  <button class="atla" id="bAtla">Atla<span>J tuşu</span></button>
+</div>
+
+<div class="perde gizli" id="ogretBitti">
+  <div class="kart">
+    <h1>Hazırsın.</h1>
+    <p class="alt">Bundan sonrası gerçek: park bitene kadar bir salıncaktan diğerine. Zincir çubuğuna göz kulak ol.</p>
+    <button class="basla" id="bOgretBasla">Sallanmaya başla</button>
+    <button class="ikinci" id="bOgretMenu" style="width:100%;margin-top:9px">Menü</button>
+  </div>
+</div>
+
+<div class="perde" id="menu">
+  <div class="kart">
+    <h1>Salıncak</h1>
+    <p class="alt">Kimse itmiyor seni. Bir salıncaktan diğerine, park bitene kadar.</p>
+
+    <div class="ozet">
+      <div><span>rekor</span><b id="mRekor">—</b></div>
+      <div><span>kese</span><b class="cuz" id="mPara">0</b></div>
+    </div>
+
+    <div class="kim" id="kimlik"></div>
+    <button class="basla" id="bBasla">Sallanmaya başla</button>
+
+    <div class="sekme">
+      <button class="dgm" id="bDukkan" aria-pressed="false">Jokerler</button>
+      <button class="dgm" id="bOgretici">Nasıl oynanır</button>
+      <button class="dgm" id="bAyarlar" aria-pressed="false">Ayarlar</button>
+      <button class="dgm gizli" id="bKur">Ana ekrana ekle</button>
+    </div>
+
+    <div class="panel gizli" id="dukkan"></div>
+    <div class="panel gizli" id="ayarlarPanel">
+      <div class="ayar"><span>Ses</span>
+        <button class="anahtar" data-ses aria-pressed="true"><span class="top"></span></button>
+      </div>
+      <div class="ayar"><span>Müzik</span>
+        <button class="anahtar" data-muzik aria-pressed="true"><span class="top"></span></button>
+      </div>
+      <div class="ayar"><span>Sürekli oyna</span>
+        <button class="anahtar" data-surekli aria-pressed="false"><span class="top"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="perde gizli" id="duraklat">
+  <div class="kart">
+    <h1>Duraklatıldı</h1>
+    <div class="dokum" id="dSkor"></div>
+    <div class="panel">
+      <div class="ayar"><span>Ses</span>
+        <button class="anahtar" data-ses aria-pressed="true"><span class="top"></span></button>
+      </div>
+      <div class="ayar"><span>Müzik</span>
+        <button class="anahtar" data-muzik aria-pressed="true"><span class="top"></span></button>
+      </div>
+      <div class="ayar"><span>Sürekli oyna</span>
+        <button class="anahtar" data-surekli aria-pressed="false"><span class="top"></span></button>
+      </div>
+    </div>
+    <button class="basla" id="bSurdur">Sürdür</button>
+    <button class="ikinci" id="bDuraklatMenu" style="width:100%;margin-top:9px">Menüye dön</button>
+  </div>
+</div>
+
+<div class="perde gizli" id="son">
+  <div class="kart">
+    <div class="olcu" id="sBas">skor</div>
+    <div class="skor" id="sSkor">0</div>
+    <div class="dokum" id="sDok"></div>
+    <div class="olcu surekliGosterge gizli" id="surekliGosterge">otomatik yeniden başlıyor…</div>
+    <button class="basla devam gizli" id="bDevam">Devam et<span>1 can harcanır</span></button>
+    <button class="basla" id="bTekrar">Tekrar dene</button>
+    <div class="ikili"><button class="ikinci" id="bMenu">Menü</button></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+<script type="module" src="js/kurulum.js"></script>
