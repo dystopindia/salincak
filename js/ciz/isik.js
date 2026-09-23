@@ -3,10 +3,13 @@ import { ekr, kamX, PM } from '../cekirdek/kamera.js';
 import { kis, renkA } from '../cekirdek/matematik.js';
 import { BOL, bolgeNo } from '../oyun/tanimlar.js';
 import { gunEvresi } from './zaman.js';
+import { iskeletVar, iskeletFener } from './sprite.js';
 
 // Her salıncağın kirişinin sağ ucunda bir lamba asılı. Hem estetik hem
 // işlevsel: karanlıkta bir sonraki salıncağın yerini bu işaretliyor.
-export const lambaKonum = s => ({ x: s.x+.78, y: s.py-.22 });
+// İskelet resmi varsa fener resmin içinde (kirişin ucundan ~2 m sağda,
+// ~1 m aşağıda); ışık havuzu ve kenar ışığı tam oradan yayılmalı.
+export const lambaKonum = s => iskeletFener(s) || { x: s.x+.78, y: s.py-.22 };
 
 const MENZIL = 4.6;          // ışık havuzunun yarıçapı (m)
 const KENAR_MENZIL  = 5.2;          // kenar ışığının etki mesafesi (m)
@@ -36,7 +39,7 @@ export function isiklar(d,b){
     if(s.x < kamX-MENZIL-6) continue;
     if(s.x > kamX+MENZIL+16) break;
     const L=lambaKonum(s);
-    fener(L,renk);
+    if(!iskeletVar()) fener(L,renk);        // resimde fener zaten çizili
 
     const p=ekr(L.x,L.y);
     X.globalCompositeOperation='lighter';

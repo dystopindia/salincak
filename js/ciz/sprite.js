@@ -1,5 +1,8 @@
 import { X } from '../cekirdek/tuval.js';
-import { RESIM } from './resimler.js';
+import { ekr, PM } from '../cekirdek/kamera.js';
+import { RESIM, ISKELET } from './resimler.js';
+import { renkKar } from '../cekirdek/matematik.js';
+import { BOL } from '../oyun/tanimlar.js';
 
 // Resimli karakterler (sprite). Resmi olan karakter resimle, olmayan eskisi
 // gibi kodla çiziliyor (karakter.js) — karakterler tek tek geçebilsin diye.
@@ -62,4 +65,74 @@ export function spriteCiz(sx, sy, aci, poz, k, isik){
   X.imageSmoothingQuality = 'high';
   X.drawImage(r.img, p.x, p.y, p.w, p.h, x0, y0, w, h);
   X.restore();
+}
+
+// --- salıncak iskeletleri ------------------------------------------------
+// Beş bölge, beş kostüm (BOL sırasıyla); her salıncak kendi bölgesininkini
+// giyiyor (s.bol — üretildiği andaki bölge). Zincir ve oturak KODDA kalıyor:
+// sallanıyorlar, dönüyorlar ve yoruldukça halkaları uzayıp inceliyor (§6.12)
+// — o uzama "kopmak üzere" uyarısı, resme dönerse kaybolurdu.
+const isk = { img:new Image(), hazir:false, perde:null };
+isk.img.onload = ()=>{ isk.perde = gecePerdeleri(); isk.hazir = true; };
+isk.img.src = ISKELET.dosya;
+
+// Yatay daraltma. Resimde ayak açıklığı pivot yüksekliğinin 1.16 katı:
+// 4.9 m'lik bir salıncakta ~5.7 m — en dar boşluk 5 m (§6), yan yana iki
+// salıncağın ayakları üst üste biniyordu (ilk ekran görüntüsünde oldu).
+// .78 ile ~0.9 kat: eski çizimdeki ±2.4 m. Bacaklar biraz dikleşiyor, bu
+// stilde göze batmıyor.
+const ISK_EN = .78;
+
+// Gece perdesi: resim gündüz renkleriyle çizildi, gece sahnesine olduğu
+// gibi konunca yapıştırılmış gibi duruyor ve karakteri, paraları, yörünge
+// çizgisini bastırıyordu (eski iskelet bilerek koyu, silüet gibiydi).
+// Her kareye kendi bölgesinin gece tonunda düz bir silüet; gece bunun
+// alfasıyla üstüne biniyor. FENER HARİÇ: silüetten fenerin çevresi
+// oyuluyor — ışık kaynağı kararmamalı, bloom (§6.15) onu yakalamalı.
+const GECE_KOYU = .62, FENER_YARICAP = 34;
+function gecePerdeleri(){
+  return ISKELET.kareler.map((k, i)=>{
+    const t = document.createElement('canvas');
+    t.width = k.w; t.height = k.h;
+    const c = t.getContext('2d');
+    c.drawImage(isk.img, k.x, k.y, k.w, k.h, 0, 0, k.w, k.h);
+    c.globalCompositeOperation = 'source-in';
+    const B = BOL[i % BOL.length];
+    c.fillStyle = renkKar(B.on, B.gok[1], .5);
+    c.fillRect(0, 0, k.w, k.h);
+    c.globalCompositeOperation = 'destination-out';
+    const g = c.createRadialGradient(k.fx, k.fy, 0, k.fx, k.fy, FENER_YARICAP);
+    g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(.6, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(k.fx, k.fy, FENER_YARICAP, 0, 6.3); c.fill();
+    return t;
+  });
+}
+
+export const iskeletVar = () => isk.hazir;
+const iskNo = s => (s.bol|0) % ISKELET.kareler.length;
+const iskKare = s => ISKELET.kareler[iskNo(s)];
+
+// DÜNYA ölçeğinde: resimdeki kiriş-zemin yüksekliği salıncağın pivot
+// yüksekliğine (s.py, 4.4-5.4 m) eşitleniyor — karakter gibi sabit piksel
+// DEĞİL, salıncak dünyanın parçası. Yüksekliği farklı salıncaklar orantılı
+// büyüyüp küçülüyor; ayak açıklığı (~pivot yüksekliği) eski çizimdeki
+// ±2.4 m ile aynı, 5 m'lik en dar boşlukta bile komşuyla çakışmıyor.
+// gece: 0 öğle, 1 gece yarısı (sahne.ciz'den; gökyüzüyle aynı eğri).
+export function iskeletCiz(s, gece=0){
+  const k = iskKare(s), u = s.py*PM/(k.ty - k.py), ux = u*ISK_EN, p = ekr(s.x, s.py);
+  const x = p.sx - k.px*ux, y = p.sy - k.py*u, w = k.w*ux, h = k.h*u;
+  X.drawImage(isk.img, k.x, k.y, k.w, k.h, x, y, w, h);
+  if(gece > .02){
+    X.globalAlpha = gece*GECE_KOYU;
+    X.drawImage(isk.perde[iskNo(s)], x, y, w, h);
+    X.globalAlpha = 1;
+  }
+}
+
+// Resimdeki fenerin dünya konumu — ışık havuzu ve kenar ışığı oradan
+// yayılsın (isik.lambaKonum). Resim yoksa null: eski sabit konum.
+export function iskeletFener(s){
+  if(!isk.hazir) return null;
+  const k = iskKare(s), m = s.py/(k.ty - k.py);
+  return { x: s.x + (k.fx - k.px)*m*ISK_EN, y: s.py - (k.fy - k.py)*m };
 }

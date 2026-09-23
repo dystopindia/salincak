@@ -1,7 +1,7 @@
 import { X, W, sakin } from '../cekirdek/tuval.js';
 import { ekr, izle, kamX, PM, olcek } from '../cekirdek/kamera.js';
 import { kis, renkA } from '../cekirdek/matematik.js';
-import { bolgeNo } from '../oyun/tanimlar.js';
+import { bolgeNo, BOL } from '../oyun/tanimlar.js';
 import { oturX, oturY, yorunge, tutunmaR, yer, ruzg } from '../oyun/fizik.js';
 import { hayalet } from '../oyun/hayalet.js';
 import { gok } from './gokyuzu.js';
@@ -16,7 +16,7 @@ import { paraCiz, paraPop, irtifaPop } from './para.js';
 import { seriCiz } from './seri.js';
 import { izCiz } from './iz.js';
 import { ruzgarCiz } from './ruzgar.js';
-import { parcaciklarCiz } from './zaman.js';
+import { parcaciklarCiz, gunEvresi } from './zaman.js';
 import { vinyet, gren } from './rotus.js';
 
 export function ciz(d, dt=1/60){
@@ -42,12 +42,16 @@ export function ciz(d, dt=1/60){
   orta(d,bz);
   zemin(d,bz);
 
+  // Gece: resimli iskeletler bununla kararıyor (sprite.iskeletCiz) —
+  // gökyüzüyle aynı gündüz eğrisi, bölge geçişinde aynı karışım.
+  const gece = 1 - ((1-t)*gunEvresi(d, BOL[b1].gunEtki).gunGuc + t*gunEvresi(d, BOL[b2].gunEtki).gunGuc);
+
   // görünürdeki salıncaklar
   for(let j=Math.max(0,d.i-2); j<d.sal.length; j++){
     const s=d.sal[j];
     if(s.x < kamX-W/(PM*2)-4) continue;
     if(s.x > kamX+W/(PM*2)+4) break;
-    iskelet(s, j===d.i);
+    iskelet(s, j===d.i, gece);
     zincirCiz(s, j===d.i && d.faz==='salinim', elAraligi(d.k));
   }
 

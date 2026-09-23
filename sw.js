@@ -1,6 +1,6 @@
 // derle.py tarafindan uretildi — elle duzenleme, derlemede uzerine yazilir.
 // Dosya listesi derle.py'deki SIRA'dan turetiliyor.
-const SURUM = 'salincak-aa026922f8';
+const SURUM = 'salincak-a377a529a2';
 const DOSYALAR = [
   './',
   'index.html',
@@ -49,6 +49,7 @@ const DOSYALAR = [
   'js/ui/hud.js',
   'js/main.js',
   'resim/cocuk.png',
+  'resim/iskelet.webp',
 ];
 
 self.addEventListener('install', e => {

@@ -2,9 +2,12 @@ import { X } from '../cekirdek/tuval.js';
 import { ekr, PM } from '../cekirdek/kamera.js';
 import { kis, lerp } from '../cekirdek/matematik.js';
 import { oturX, oturY } from '../oyun/fizik.js';
+import { iskeletVar, iskeletCiz } from './sprite.js';
 
-// A ayakları ve üst kiriş
-export function iskelet(s,aktif){
+// A ayakları ve üst kiriş. Resim yüklendiyse resim (sprite.iskeletCiz),
+// yoksa ya da yüklenemezse eski çizgi çizimi.
+export function iskelet(s,aktif,gece=0){
+  if(iskeletVar()){ iskeletCiz(s, gece); return; }
   X.lineCap='round';
   X.strokeStyle=aktif?'#4A4278':'#332E5C'; X.lineWidth=4;
   for(const q of [-1,1]){
