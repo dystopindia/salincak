@@ -50,17 +50,21 @@ function siluet(r, poz, renk){
 export function spriteCiz(sx, sy, aci, poz, k, isik){
   const r = RES[k.id], p = r.pozlar[poz] || r.pozlar.otur, o = 1/r.depo;
   const x0 = -p.ox*o, y0 = -p.oy*o, w = p.w*o, h = p.h*o;
+  // alfa: karakterin kendi saydamlığı (hayalet .82). Çarpılıyor, ezmiyor:
+  // rakip hayalet (§10) karakteri zaten soluk çiziyor, ikisi üst üste biner.
+  const a0 = X.globalAlpha * (r.alfa ?? 1);
   // Kenar ışığı: kod çizimindekiyle aynı fikir (karakter.js) — lambaya
   // doğru kaydırılmış düz renkli kopya altta, yalnız ışığa bakan kenardan sızıyor.
   if(isik && isik.g > .04){
     const kay = 2.0 + isik.g*1.6;
     X.save();
-    X.globalAlpha = Math.min(.95, isik.g); X.globalCompositeOperation = 'lighter';
+    X.globalAlpha = Math.min(.95, isik.g) * a0; X.globalCompositeOperation = 'lighter';
     X.translate(sx + isik.x*kay, sy + isik.y*kay); X.rotate(aci);
     X.drawImage(siluet(r, poz, isik.renk), x0, y0, w, h);
     X.restore();
   }
   X.save();
+  X.globalAlpha = a0;
   X.translate(sx, sy); X.rotate(aci);
   X.imageSmoothingQuality = 'high';
   X.drawImage(r.img, p.x, p.y, p.w, p.h, x0, y0, w, h);
