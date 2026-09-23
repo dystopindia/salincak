@@ -26,5 +26,9 @@ export const ISKELET = { dosya:'resim/iskelet.webp',
 // Boyalı arka plan katmanları, bölge numarasıyla. Kenarları harmanlanmış,
 // yatayda kesintisiz tekrar ediyor. alt: taban rengi (altı bununla doluyor).
 export const BOYALI = {
-  0: { uzak:{dosya:'resim/park-uzak.webp',w:2132,h:261,alt:'#6e8d91'}, orta:{dosya:'resim/park-orta.webp',w:1492,h:293,alt:'#375266'}, on:{dosya:'resim/park-on.webp',w:1279,h:119,alt:'#1b1638'} }
+  0: { uzak:{dosya:'resim/park-uzak.webp',w:1957,h:261,alt:'#6e8d91'}, orta:{dosya:'resim/park-orta.webp',w:1493,h:293,alt:'#375266'}, on:{dosya:'resim/park-on.webp',w:1209,h:119,alt:'#1b1638'} },
+  1: { uzak:{dosya:'resim/orman-uzak.webp',w:2042,h:260,alt:'#649492'}, orta:{dosya:'resim/orman-orta.webp',w:1389,h:322,alt:'#1c5050'}, on:{dosya:'resim/orman-on.webp',w:1253,h:130,alt:'#081913'} },
+  2: { uzak:{dosya:'resim/bulutlar-uzak.webp',w:1900,h:333,alt:'#e6c9ef'}, orta:{dosya:'resim/bulutlar-orta.webp',w:1464,h:286,alt:'#b47ad5'}, on:{dosya:'resim/bulutlar-on.webp',w:1090,h:127,alt:'#1d1639'} },
+  3: { uzak:{dosya:'resim/yorunge-uzak.webp',w:2151,h:280,alt:'#6278ba'}, orta:{dosya:'resim/yorunge-orta.webp',w:1506,h:267,alt:'#3f4d6d'}, on:{dosya:'resim/yorunge-on.webp',w:1218,h:142,alt:'#0e0f28'} },
+  4: { uzak:{dosya:'resim/buz-uzak.webp',w:1767,h:255,alt:'#79c8f4'}, orta:{dosya:'resim/buz-orta.webp',w:1444,h:258,alt:'#057ed1'}, on:{dosya:'resim/buz-on.webp',w:1204,h:140,alt:'#10163c'} }
 };

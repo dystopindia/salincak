@@ -8,7 +8,7 @@ import { BOYALI } from './resimler.js';
 // Boyalı arka plan katmanları: dışarıda çizdirilmiş (ChatGPT), sprite.py ile
 // kırpılıp kenarları harmanlanmış resimler. Resmi olan bölge resimle,
 // olmayan eskisi gibi kodla çiziliyor (katmanlar.js) — bölgeler tek tek
-// geçebilsin diye. Şimdilik yalnız park.
+// geçebilsin diye. Beş bölgenin beşi de resimli.
 //
 // Kodun yaptığı üç şey, resmin yapamadığı:
 // 1. TEKRAR. Dünya sonsuz; resim kendi genişliği kadar aralıkla yan yana
@@ -22,15 +22,19 @@ import { BOYALI } from './resimler.js';
 //    biri); resim sabit olduğu için katman tabanından yukarı doğru artan bir
 //    kaydırmayla (shear) EĞİLİYOR — otlar yine rüzgâra yatıyor.
 //
-// Yerler ve boylar burada (tasarım kararı), resmin özellikleri resimler.js'te.
-// yuk: resmin (kırpılmış) dünya yüksekliği, taban: alt kenarının dünya y'si.
-// Sayılar yatay telefonda (740×360) ekran görüntüsüyle seçildi.
-const YER = {
-  0: {
-    uzak: { k:KATMAN.uzak, yuk:3.7, taban:1.4,  perde:[.28,.78], sis:.85, isik:1.18 },
-    orta: { k:KATMAN.orta, yuk:3.3, taban:.05,  perde:[.10,.70], sis:.40, isik:.62 },
-    on:   { k:KATMAN.on,   yuk:1.5, taban:-2.6, perde:[.40,.86], on:true },
-  },
+// Yerler burada (tasarım kararı), resmin özellikleri resimler.js'te. Katman
+// TÜRÜNE göre, bölgeye göre değil: beş bölgenin sayfaları aynı boyutta ve
+// sprite.py'de tür başına aynı ölçekle işlendi, yani dünya boyu atlas
+// yüksekliğinden türüyor (yuk = h / pxm). Uzun çamlı orman orta katmanı
+// böylece parkın ağaçlarından kendiliğinden daha uzun çıkıyor.
+//   pxm  : atlas px / dünya metresi (park ekran görüntüsüyle seçildi:
+//          uzak 3.7 m, orta 3.3 m, ön 1.5 m)
+//   taban: resmin alt kenarının dünya y'si
+//   perde: gece perdesinin alfası [öğle, gece yarısı]
+const TUR = {
+  uzak: { k:KATMAN.uzak, pxm:70.5, taban:1.4,  perde:[.28,.78], sis:.85, isik:1.18 },
+  orta: { k:KATMAN.orta, pxm:88.8, taban:.05,  perde:[.10,.70], sis:.40, isik:.62 },
+  on:   { k:KATMAN.on,   pxm:79.3, taban:-2.6, perde:[.40,.86], on:true },
 };
 
 const BOYA = {};
@@ -49,7 +53,7 @@ for(const b in BOYALI){
 // zemin↔ufuk karışımı + parlaklık). Böylece resimli ve resimsiz bölgeler
 // gece aynı tonlara iniyor. Ön plan bölgenin ön rengine (neredeyse siyah).
 function perdeRenk(b, ad){
-  const B = BOL[b], y = YER[b][ad];
+  const B = BOL[b], y = TUR[ad];
   return y.on ? B.on : parlaklik(renkKar(B.yer, B.gok[2], y.sis), y.isik);
 }
 function perdeKur(g, b, ad){
@@ -67,10 +71,10 @@ export const boyaliVar = (b, ad) => !!(BOYA[b] && BOYA[b][ad] && BOYA[b][ad].haz
 
 // gece: 0 öğle, 1 gece yarısı.
 export function boyaliCiz(b, ad, gece, d){
-  const g = BOYA[b][ad], y = YER[b][ad], k = y.k;
+  const g = BOYA[b][ad], y = TUR[ad], k = y.k;
   const a = lerp(y.perde[0], y.perde[1], gece);
-  const mpp = y.yuk / g.h, tg = g.w * mpp;            // tekrar genişliği (m)
-  const ust = ekrK(0, y.taban + y.yuk, k).sy, alt = ekrK(0, y.taban, k).sy;
+  const yuk = g.h / y.pxm, tg = g.w / y.pxm;           // dünya boyu ve tekrar genişliği (m)
+  const ust = ekrK(0, y.taban + yuk, k).sy, alt = ekrK(0, y.taban, k).sy;
   const h = alt - ust, wEkran = tg*PM;
   const yari = (W/PM)*.62 + tg;
   const bas = Math.floor((kamX*k - yari)/tg)*tg, son = kamX*k + yari;
