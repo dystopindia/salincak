@@ -1,7 +1,7 @@
 import * as E from '../cekirdek/dom.js';
 import { kis } from '../cekirdek/matematik.js';
 import { BOL, bolgeNo, turNo } from '../oyun/tanimlar.js';
-import { ruzg } from '../oyun/fizik.js';
+import { ruzg, irtifaParasi } from '../oyun/fizik.js';
 import { JOKER, aktif, jokerKullan } from '../oyun/joker.js';
 import { kayit, sahip } from '../cekirdek/kayit.js';
 import { hayalet } from '../oyun/hayalet.js';
@@ -12,6 +12,9 @@ import { ADIMLAR, ogreticiAdim } from '../oyun/ogretici.js';
 const SURELI = JOKER.filter(j => j.sure);
 let dugme = null;
 let sonRuzRenk = null;   // renk her karede değil, yalnız değişince yazılıyor
+// Hedef bildirimi sırası: gösterim durumu UI'da tutuluyor, d'ye yazılmıyor.
+// Aynı karede iki hedef tamamlanabilir (ormana ulaş + ×3 seri) — sırayla.
+let hedefD = null, hedefSira = 0, hedefBas = -1;
 
 // Tur içi joker çubuğu bir kez kuruluyor; her karede yalnız durumu tazeleniyor.
 function jokerKur(){
@@ -70,6 +73,13 @@ export function hudG(d){
   E.hBar.style.background = aktif(d,'zincir') ? '#79D9AC'
                           : k>.75?'#D3506F' : k>.45?'#F2B33D' : '#79D9AC';
   E.hGic.style.opacity = k>.6 ? (.5+.5*Math.sin(d.t*9)) : 0;
+
+  // İrtifa ödülü, çubuğun hemen üstünde: sallanırken "şimdi atlarsan",
+  // uçarken "tutunursan" ne kadar ◆ — kumarın karşılığı tam riskin yanında.
+  const pot = d.faz==='salinim' ? irtifaParasi(k)
+            : d.faz==='ucus'    ? irtifaParasi(d.atlamaYorgun||0) : 0;
+  const pYazi = pot>0 ? '+'+pot+' ◆' : '';
+  if(E.hIrtifa.textContent!==pYazi) E.hIrtifa.textContent=pYazi;
   gicirtiGuncelle(aktif(d,'zincir') ? 0 : k);   // joker açıkken görsel çubuk yeşil kalıyor, ses de sussun
 
   E.hIp.style.opacity = d.ogret>7 ? 0 : 1;
@@ -92,6 +102,22 @@ export function hudG(d){
     b.classList.toggle('acik', acik);
     b.querySelector('.n').textContent = acik ? Math.ceil(d.jok[j.id])+'s' : a;
   });
+
+  // Hedef bildirimi: tamamlananlar d.yeniHedefler'de (oyun/hedef.js),
+  // burada yalnız sırayla gösteriliyor. Her biri 2.8 s.
+  if(d!==hedefD){ hedefD=d; hedefSira=0; hedefBas=-1; E.hHedef.style.opacity=0; }
+  const yh=d.yeniHedefler||[];
+  if(hedefBas<0 && hedefSira<yh.length){
+    const h=yh[hedefSira];
+    E.hHedefAd.textContent=h.ad;
+    E.hHedefOdul.textContent='+'+h.odul+' ◆'+(h.iz ? ' · '+h.iz.toLowerCase()+' izi açıldı' : '');
+    hedefBas=d.t;
+  }
+  if(hedefBas>=0){
+    const y=d.t-hedefBas;
+    E.hHedef.style.opacity = y<.3 ? kis(y/.3,0,1) : y<2.4 ? 1 : kis(1-(y-2.4)/.4,0,1);
+    if(y>2.8){ hedefSira++; hedefBas=-1; }
+  }
 
   // bölge kartı: bölüm başlığı gibi — rakam, ad, tek satır söz. 3 s kalıyor.
   const b=bolgeNo(d.i);

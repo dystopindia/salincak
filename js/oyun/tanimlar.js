@@ -51,6 +51,15 @@ export const turNo = i =>
 // büyüklüğü iki yerden birden okunuyor ve tek kaynak olmak zorunda.
 export const ADIM = 1/240;
 
+// Fizik sürümü: hayalet kaydı basışları saklıyor, konumları değil — yani
+// fizik değişirse ESKİ bir kayıt yeni fizikte başka bir yola gider ve
+// hayalet oyuncunun hiç oynamadığı bir tur oynar. Kayıt bu sayıyla
+// damgalanıyor, tutmayan kayıt gösterilmiyor. SALINIMI ya da UÇUŞU
+// etkileyen her değişiklikte artır (skor kuralı değişikliği gerekmez:
+// geri oynatma skoru zaten yeniden hesaplıyor).
+//   1: ilk sürüm   2: tutunmada genlik enerjiden (fizik.genlik)
+export const FIZIK_SURUM = 2;
+
 export const LFARK = .55;    // toplam ip boyu değişimi (m) — büyütme, oyun kontrolsüzleşir
 export const LHIZ0 = 1.35;   // L' üst sınırı (m/s) — ani L' pompalamayı patlatır
 export const SLACK = 2.95;   // bu açının ötesinde zincir boşalır (rad)

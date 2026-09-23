@@ -60,6 +60,73 @@ export const pompaVerimi = gen =>
 
 export function bildir(d,m,c){ d.mesaj=m; d.mesajT=d.t; d.mesajRenk=c; }
 
+// Anlık genlik, ENERJİDEN: ½(Lω)² + gL(1−cosθ) = gL(1−cosA)
+//   ⇒ cos A = cosθ − Lω²/(2g).   c ≤ −1 ise salıncak tepeden aşacak kadar hızlı.
+//
+// Neden gerekli: s.gen normalde son DÖNÜŞ NOKTASINDAKİ açı (ω işaret
+// değiştirdiğinde yazılıyor). Tutunma anında ise eskiden tutunma AÇISINA
+// ayarlanıyordu — hızlı bir tutunuşta salıncak 2.5 rad'lık enerji taşırken
+// gen 0.6 diyordu, ilk dönüş noktasına kadar. O arada dipte pompalayan
+// oyuncu: (1) pompaVerimi gen'e baktığı için TAM güçte pompalıyordu ve
+// tepeden aşıyordu, (2) geri bildirim 1−|θ|/gen olduğu için buna "tam
+// zamanında" diyordu. Ölçüm botu bunu yakaladı: 12 tohumun 12'sinde 2-3.
+// salıncakta "tepede zincir boşaldı". Düzeltme yalnız tutunma anında —
+// normal salınımda gen'in anlamı ve §2'deki merdiven değişmedi.
+export function genlik(s,g){
+  const c=Math.cos(s.th) - s.L*s.om*s.om/(2*g);
+  return c<=-1 ? Math.PI : Math.acos(Math.min(1,c));
+}
+
+// --- irtifa bonusu -----------------------------------------------------
+// Zincir çubuğu artık yalnız CEZA değil, KUMAR: atladığın anda çubuk ne
+// kadar doluysa, bir sonraki salıncağa tutunduğunda o kadar PARA (◆).
+// Ayrı bir sayaç yok — risk ile ödül aynı çubukta, oyuncunun zaten baktığı
+// yerde. Çubuk "yüksekte geçirilen saniye" başına doluyor (§5), yani bu
+// tam olarak "yüksekte kalınan her saniye biriken, tutunmada nakde
+// çevrilen" bonus.
+//
+// NEDEN SKOR ÇARPANI DEĞİL — ölçüldü, işe yaramadı. İlk sürüm tutunma
+// skorunu 1+1.5y² ile çarpıyordu. Bot ölçümünde (16 tohum) çubuğu bilerek
+// dolduran her strateji kaybetti: %30 bekleyen 18 yerine 10.6 salıncak,
+// %50 bekleyen 3.6 salıncak. Sebep yapısal: kumarın ödülü TEK tutunuşun
+// skoru, bedeli ise turun TÜM geri kalanı. Tek olayın çarpanı bunu hiçbir
+// K değerinde dengeleyemez; hiç kârlı olmayan kumar da karar değildir.
+// Para ise bankaya yatıyor (akis.bitir), sonradan ölsen bile KALIYOR —
+// kazanç sonraki bir ölümle silinmiyor. Skor kuralı da hiç değişmediği için
+// rekorların ve günün turu skorlarının karşılaştırılabilirliği korunuyor.
+// Karar artık gerçek: rekor peşindeysen temkinli, kese peşindeysen cesur.
+//
+// Biçim: %35'in altı ÖLÜ BÖLGE, üstü karesel — %50'de 1, %80'de 9, %95'te
+// 17 ◆. Ölü bölge şart: normal oyunda çubuk atlarken ortalama %27 (ölçüm)
+// ve orada ödül olmamalı, yoksa "kumar" herkesin rutin geliri olur.
+// Karesel çünkü asıl ödül kopma sınırına YAKIN olmalı.
+//
+// Dört biçim aynı 24 tohumluk bot turlarında karşılaştırıldı (ödeme
+// yörüngeyi etkilemediği için tek tur setinden hepsi hesaplanabildi):
+//
+//   strateji         tur başına ◆   skor     salıncak
+//   normal               25.9       5190       17.7
+//   %30'da atla          45.4       2131        8.7    ← tatlı nokta
+//   %40'ta atla          30.8        797        4.4
+//   %50'de atla          22.8        444        3.1
+//
+// Ölçülü kumar kesede +%75, skorda −%59: gerçek bir takas. Aşırı
+// açgözlülük İKİ cephede de kaybediyor — bu da onu beceri yapan şey.
+// Bedel: normal oyunda tur başına para ~13'ten ~26'ya çıktı (orman ve
+// bulutlarda boşluk zaten 2.2+ rad istiyor, çubuk kendiliğinden %40-60'a
+// geliyor). Jokerler yaklaşık iki kat erişilebilir; fiyatlara dokunulmadı.
+//
+// Sağlam zincir jokeri açıkken çubuk dolmuyor → bonus da yok. Riski
+// satın alan ödülü de satın almamış olur; ayrı bir kural gerekmedi.
+export const IRTIFA_PARA = 20, IRTIFA_ESIK = .35;
+export const irtifaParasi = y =>
+  Math.floor(IRTIFA_PARA * Math.max(0,(y-IRTIFA_ESIK)/(1-IRTIFA_ESIK))**2);
+
+// "Temkinli" hedefi için: çubuk bu sınırın altında kaldıysa atlayış temkinli.
+// HUD'da çubuğun kırmızıya döndüğü eşikle AYNI (.75) — oyuncunun gördüğü
+// "kırmızı" ile kuralın "kırmızı"sı ayrışmasın.
+export const TEMKIN_SINIR = .75;
+
 // --- eylemler: saf durum geçişleri -----------------------------------
 // Bunlar eskiden girdi.js'in içindeydi. Oraya AİT DEĞİLLER: girdi.js olay
 // katmanı (hangi tuş, hangi dokunuş), bu ikisi ise oyunun kuralı. Ayrılma
@@ -86,6 +153,9 @@ export function atlaUygula(d){
     const s=d.sal[d.i], v=hizv(s);
     d.faz='ucus'; d.px=oturX(s); d.py=oturY(s); d.vx=v.x; d.vy=v.y; d.don=0; d.uzanma=0;
     s.poz='cokuk';
+    // Kumarın bedeli burada kilitleniyor: bırakılan zincirin yorgunluğu.
+    // Havada düşersen bu değer de gidiyor — ödül ancak tutunursan ödeniyor.
+    d.atlamaYorgun=s.yorgun; d.ucusT=d.t;
     return true;
   }
   if(d.faz==='ucus'){ d.uzanma=.38; return true; }
@@ -115,7 +185,7 @@ export function yakala(d){
       s.L=kis(Math.hypot(d.px-s.x, s.py-d.py), s.Lk, s.Lu);
       const t={x:Math.cos(s.th), y:Math.sin(s.th)};
       s.om=(d.vx*t.x+d.vy*t.y)/s.L;
-      s.yorgun=0; s.poz='cokuk'; s.pompaT=-9; s.gen=Math.max(.2,Math.abs(s.th));
+      s.yorgun=0; s.poz='cokuk'; s.pompaT=-9; s.gen=Math.max(.2,genlik(s,yer(d)));
       const atlanan=j-d.i-1;
       let c = d.uzanma>0 ? 1.6 : 1;
       if(atlanan>0) c*=1.9+atlanan*.6;
@@ -128,6 +198,24 @@ export function yakala(d){
       d.seri = harika ? d.seri+1 : 0;
       if(harika){ d.seriT=d.t; d.enSeri=Math.max(d.enSeri||0, d.seri); }
       c *= 1+Math.min(.8,d.seri*.12);
+
+      // İrtifa: atlarken kilitlenen yorgunluk şimdi ÖDENİYOR — para olarak.
+      // d.para'ya ekleniyor: tur sonunda (ya da can ile devamda) bankaya
+      // topladığın paralarla birlikte yatıyor. Skora +8/para EKLENMİYOR;
+      // skor kuralı bu özellikten önceki haliyle aynı kalmalı (yukarıya bak).
+      const y=d.atlamaYorgun||0, irt=irtifaParasi(y);
+      d.para+=irt; d.irtifa=irt; d.irtifaT=d.t; d.atlamaYorgun=0;
+      d.irtifaToplam+=irt;
+      if(irt>0) paraSesi();
+
+      // Tur istatistikleri — ustalık hedefleri (oyun/hedef.js) bunlara
+      // bakan saf yüklemler. Burada tutuluyorlar çünkü olayın kendisi
+      // (kaç salıncak atlandı, uzanıldı mı) yalnız bu anda biliniyor.
+      d.enIrtifa=Math.max(d.enIrtifa, irt);          // tek tutunuşta en çok ◆
+      d.enAtlanan=Math.max(d.enAtlanan, atlanan);
+      if(d.uzanma>0) d.uzanmaSayisi++;
+      d.temkin = y<TEMKIN_SINIR ? d.temkin+1 : 0;
+      d.enTemkin=Math.max(d.enTemkin, d.temkin);
       d.skor += Math.round((s.x-d.sal[d.i].x)*12*c);
       d.i=j; d.faz='salinim'; salincakGerek(d,d.i+3);
       bildir(d, atlanan>0 ? (atlanan+1)+' salıncak birden!' :

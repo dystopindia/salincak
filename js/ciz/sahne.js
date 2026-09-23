@@ -11,8 +11,9 @@ import { iskelet, zincirCiz } from './salincak.js';
 import { karakter } from './karakter.js';
 import { isiklar, kenarIsik } from './isik.js';
 import { uzuv } from './uzuv.js';
-import { paraCiz, paraPop } from './para.js';
+import { paraCiz, paraPop, irtifaPop } from './para.js';
 import { seriCiz } from './seri.js';
+import { izCiz } from './iz.js';
 import { ruzgarCiz } from './ruzgar.js';
 import { parcaciklarCiz } from './zaman.js';
 import { vinyet, gren } from './rotus.js';
@@ -99,6 +100,7 @@ export function ciz(d, dt=1/60){
       X.strokeStyle='rgba(121,217,172,.5)'; X.lineWidth=2;
       X.beginPath(); X.arc(q.sx,q.sy,tutunmaR(d)*PM,0,6.3); X.stroke();
     }
+    izCiz(d);          // uçuş izi — karakterin ARKASINDA (ciz/iz.js)
     karakter(q.sx,q.sy,d.don,true,d.k,kenarIsik(d,p.x,p.y));
     uzuv(d,dt,q.sx,q.sy,d.don,yer(d),ruzg(d));
   }
@@ -114,7 +116,7 @@ export function ciz(d, dt=1/60){
     X.fillText(d.mesaj,o.sx,o.sy-48-yas*16);
     X.textAlign='left'; X.globalAlpha=1;
   }
-  { const o=ekr(p.x,p.y); paraPop(d,o.sx,o.sy); }
+  { const o=ekr(p.x,p.y); paraPop(d,o.sx,o.sy); irtifaPop(d,o.sx,o.sy); }
 
   ruzgarCiz(d);       // rüzgâr çizgileri: ön plandan önce, oyun düzleminin üstünde
   on(d,bz);          // ön plan karakterin de üstünde

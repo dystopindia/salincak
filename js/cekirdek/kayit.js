@@ -14,6 +14,8 @@ export const kayit = {
   surekli: false,    // ölünce otomatik yeniden başlasın mı (Geometry Dash tarzı)
   ogretici: false,   // öğretici bir kez tamamlandı ya da geçildi mi
   hayaletAcik: true, // rekor hayaleti gösterilsin mi (ayarlar anahtarı)
+  hedef: {},         // tamamlanan ustalık hedefleri: { hedefId: true } (oyun/hedef.js)
+  iz: 'yok',         // seçili uçuş izi (ciz/iz.js); açık olup olmadığını hedef.js bilir
   joker: {},        // { jokerId: adet }
   omur: { tur:0, para:0 },
   // Serbest turun hayaleti: { tohum, kar, skor, mesafe, bitis, giris[] }.
@@ -34,7 +36,8 @@ function hayaletOku(o){
   if(typeof o.tohum!=='string' || !Array.isArray(o.giris)) return null;
   if(!o.giris.length || !o.giris.every(v => typeof v==='number' && v>=0)) return null;
   return { tohum:o.tohum, kar:Math.max(0,o.kar|0), skor:Math.max(0,o.skor|0),
-           mesafe:+o.mesafe||0, bitis:Math.max(0,o.bitis|0), giris:o.giris };
+           mesafe:+o.mesafe||0, bitis:Math.max(0,o.bitis|0), giris:o.giris,
+           fs:o.fs|0 };     // fizik sürümü; eski kayıtta yok → 0, gösterilmez
 }
 
 export function yukle(){
@@ -49,6 +52,9 @@ export function yukle(){
     if(typeof o.surekli === 'boolean') kayit.surekli = o.surekli;
     if(typeof o.ogretici === 'boolean') kayit.ogretici = o.ogretici;
     if(typeof o.hayaletAcik === 'boolean') kayit.hayaletAcik = o.hayaletAcik;
+    if(o.hedef && typeof o.hedef === 'object')
+      for(const k in o.hedef) if(o.hedef[k]===true) kayit.hedef[k]=true;
+    if(typeof o.iz === 'string') kayit.iz = o.iz;
     kayit.hayalet = hayaletOku(o.hayalet);
     if(o.gunluk && typeof o.gunluk === 'object'){
       kayit.gunluk.gun   = typeof o.gunluk.gun==='string' ? o.gunluk.gun : '';

@@ -1,5 +1,5 @@
 import { kayit, sakla } from '../cekirdek/kayit.js';
-import { ADIM } from './tanimlar.js';
+import { ADIM, FIZIK_SURUM } from './tanimlar.js';
 import { kur } from './dunya.js';
 import { adim, pompaUygula, atlaUygula } from './fizik.js';
 import { sesBastir } from '../cekirdek/ses.js';
@@ -53,9 +53,11 @@ export function hayaletSakla(d, skor){
   if(d.ogretici || d.jokerKullanildi) return false;
   if(!d.giris || d.giris.length < 2) return false;
   const eski = yuva(d.gunluk);
-  if(eski && eski.tohum===d.tohum && eski.skor>=skor) return false;
+  // Başka bir fizik sürümünün kaydı yokmuş gibi sayılıyor: skoru
+  // karşılaştırılamaz, geri oynatılamaz.
+  if(eski && eski.fs===FIZIK_SURUM && eski.tohum===d.tohum && eski.skor>=skor) return false;
   const yeni = { tohum:d.tohum, kar:d.karIdx, skor, mesafe:d.mesafe,
-                 bitis:d.adimNo, giris:d.giris };
+                 bitis:d.adimNo, giris:d.giris, fs:FIZIK_SURUM };
   if(d.gunluk) kayit.gunluk.hayalet = yeni; else kayit.hayalet = yeni;
   sakla();
   return true;
@@ -81,7 +83,7 @@ export function hayaletBasla(tohum, gunlukMu){
   HAY = null;
   if(!kayit.hayaletAcik) return;
   const k = yuva(gunlukMu);
-  if(!k || !k.giris || k.giris.length<2 || k.tohum!==tohum) return;
+  if(!k || !k.giris || k.giris.length<2 || k.tohum!==tohum || k.fs!==FIZIK_SURUM) return;
   const h = kur(tohum, k.kar);
   h.hayaletMi = true;                  // akis.bitir ve çizim bunu okuyor
   h.giris = null;                      // hayalet kendi turunu KAYDETMİYOR

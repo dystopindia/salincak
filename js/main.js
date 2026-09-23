@@ -12,6 +12,7 @@ import { ogreticiBittiMi } from './oyun/ogretici.js';
 import { ogreticiBitir } from './oyun/akis.js';
 import { bolgeNo, ADIM } from './oyun/tanimlar.js';
 import { hayaletAdim } from './oyun/hayalet.js';
+import { hedefAdim } from './oyun/hedef.js';
 import { sesiKapat, muzikAc, muzikAdim } from './cekirdek/ses.js';
 
 // ADIM (fizik adımı, 1/240) oyun/tanimlar.js'te: hayalet kaydı da onu
@@ -41,6 +42,11 @@ function dongu(su){
         hayaletAdim();
         bir -= ADIM;
       }
+      // Hedefler kare başına bir kez: fizik adımı başına bakmaya gerek yok,
+      // yüklemler tur istatistiklerine bakıyor ve bir kare gecikme hissedilmez.
+      // Tur bu karede bittiyse hal artık 'son' — o durumda bitir() içindeki
+      // hedefBitis bakıyor.
+      if(durum.hal==='oyun') hedefAdim(d);
       hudG(d);
       if(d.ogretici && ogreticiBittiMi(d)) ogreticiBitir(false);
     }

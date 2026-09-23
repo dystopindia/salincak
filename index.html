@@ -29,10 +29,11 @@
   </div>
   <div class="jokerler" id="hJok"></div>
   <div class="zincir">
-    <div class="olcu">zincir</div><div class="bar"><i id="hBar"></i></div>
+    <div class="olcu zincirBas"><span>zincir</span><b id="hIrtifa"></b></div><div class="bar"><i id="hBar"></i></div>
     <div class="gic" id="hGic">gıcırdıyor</div>
   </div>
   <div class="bolge" id="hBolge"></div>
+  <div class="hedefBildirim" id="hHedef"><small>hedef tamam</small><b id="hHedefAd"></b><i id="hHedefOdul"></i></div>
   <div class="ipucu" id="hIp">yeşil bölgeden geçerken bas</div>
   <div class="ogret" id="hOgret"><b id="hOgretNo">1/5</b><span id="hOgretMetin"></span></div>
   <button class="ikon ogretGec" id="bOgretGec">öğreticiyi geç</button>
@@ -65,12 +66,18 @@
 
     <div class="sekme">
       <button class="dgm" id="bDukkan" aria-pressed="false">Jokerler</button>
+      <button class="dgm" id="bHedefler" aria-pressed="false">Hedefler</button>
       <button class="dgm" id="bOgretici">Nasıl oynanır</button>
       <button class="dgm" id="bAyarlar" aria-pressed="false">Ayarlar</button>
       <button class="dgm gizli" id="bKur">Ana ekrana ekle</button>
     </div>
 
     <div class="panel gizli" id="dukkan"></div>
+    <div class="panel gizli" id="hedeflerPanel">
+      <div class="hedefListe" id="hedefListe"></div>
+      <div class="izBaslik">uçuş izi</div>
+      <div class="izler" id="izler"></div>
+    </div>
     <div class="panel gizli" id="ayarlarPanel">
       <div class="ayar"><span>Ses</span>
         <button class="anahtar" data-ses aria-pressed="true"><span class="top"></span></button>

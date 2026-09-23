@@ -4,6 +4,7 @@ import { durum } from '../oyun/durum.js';
 import { JOKER, satinAl } from '../oyun/joker.js';
 import { kayit, sahip, sakla } from '../cekirdek/kayit.js';
 import { gunTazele } from '../oyun/gunluk.js';
+import { HEDEF, IZLER, hedefTamam, hedefSayisi, izAcik, seciliIz, izSec } from '../oyun/hedef.js';
 import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi } from '../cekirdek/ses.js';
 
 export function goster(...ler){ ler.forEach(x=>x.classList.remove('gizli')); }
@@ -40,7 +41,8 @@ export function dukkanKur(){
     k.querySelector('button').onclick=()=>{ if(satinAl(j.id)) cuzdanTazele(); };
     E.dukkan.appendChild(k);
   });
-  PANEL.push({dgm:E.bDukkan, kutu:E.dukkan}, {dgm:E.bAyarlar, kutu:E.ayarlarPanel});
+  PANEL.push({dgm:E.bDukkan, kutu:E.dukkan}, {dgm:E.bHedefler, kutu:E.hedeflerPanel},
+             {dgm:E.bAyarlar, kutu:E.ayarlarPanel});
   PANEL.forEach(p=> p.dgm.onclick=()=> panelAc(p));
   cuzdanTazele();
 }
@@ -61,12 +63,38 @@ export function cuzdanTazele(){
   const G = kayit.gunluk;
   E.mGunluk.textContent = (G.enIyi ? 'bugünkü en iyin '+G.enIyi : 'bugün henüz oynamadın')
     + (G.seri>1 ? ' · '+G.seri+' gün üst üste' : '');
+  hedefTazele();
   JOKER.forEach(j=>{
     const a = sahip(j.id);
     const et = E.dukkan.querySelector('[data-adet="'+j.id+'"]');
     if(et) et.textContent = a ? 'elinde '+a : '';
     const b = E.dukkan.querySelector('[data-al="'+j.id+'"]');
     if(b) b.disabled = kayit.para < j.fiyat;
+  });
+}
+
+// Hedefler paneli: liste yeniden çiziliyor (14 satır, menü açılışında
+// bir kez — ucuz). Sekme etiketi ilerlemeyi gösteriyor: "Hedefler 3/14".
+function hedefTazele(){
+  E.bHedefler.textContent = 'Hedefler '+hedefSayisi()+'/'+HEDEF.length;
+  E.hedefListe.innerHTML = HEDEF.map(h=>{
+    const iz = IZLER.find(z=>z.hedef===h.id);
+    return '<div class="hd'+(hedefTamam(h.id)?' tamam':'')+'"><span class="isaret">'+
+      (hedefTamam(h.id)?'✓':'○')+'</span><span>'+h.ad+
+      (iz ? '<small>'+iz.ad.toLowerCase()+' izini açar</small>' : '')+
+      '</span><b>'+h.odul+' ◆</b></div>';
+  }).join('');
+  const sec = seciliIz();
+  E.izler.innerHTML='';
+  IZLER.forEach(z=>{
+    const b=document.createElement('button');
+    const acik=izAcik(z);
+    b.disabled=!acik; b.setAttribute('aria-pressed', z.id===sec?'true':'false');
+    const kilit = acik ? '' : HEDEF.find(h=>h.id===z.hedef).ad;
+    b.innerHTML = z.ad + (kilit ? '<small>kilitli</small>' : '');
+    if(kilit) b.title = 'Açmak için: '+kilit;
+    b.onclick=()=>{ if(izSec(z.id)){ tikSesi(); hedefTazele(); } };
+    E.izler.appendChild(b);
   });
 }
 
@@ -120,7 +148,12 @@ export function sonEkrani(d, canVar){
     (d.yeniHayalet ? '<div><span>hayalet</span><b class="iyi">yeni kayıt</b></div>' : '')+
     '<div><span>salıncak</span><b>'+(d.i+1)+'</b></div>'+
     '<div><span>mesafe</span><b>'+d.mesafe.toFixed(0)+' m</b></div>'+
-    '<div><span>topladığın para</span><b>'+d.para+' ◆</b></div>'+
+    // Para iki kaynaktan: yoldaki paralar + irtifa ödülü. İkisi de bankaya
+    // yatıyor; ayrı gösteriliyor ki kumarın getirisi görünsün.
+    '<div><span>topladığın para</span><b>'+(d.para-d.irtifaToplam)+' ◆</b></div>'+
+    (d.irtifaToplam>0 ? '<div><span>irtifa ödülü</span><b class="iyi">+'+d.irtifaToplam+' ◆</b></div>' : '')+
+    (d.yeniHedefler.length ? '<div><span>yeni hedef</span><b class="iyi">'+d.yeniHedefler.length+
+      ' · +'+d.yeniHedefler.reduce((a,h)=>a+h.odul,0)+' ◆</b></div>' : '')+
     (d.enSeri>1 ? '<div><span>en uzun seri</span><b class="iyi">×'+d.enSeri+'</b></div>' : '')+
     '<div><span>ulaştığın bölge</span><b>'+BOL[bolgeNo(d.i)].ad+'</b></div>'+
     '<div><span>'+seb+'</span><b class="kotu">son</b></div>'+

@@ -5,6 +5,7 @@ import { kayit, kazan, sakla, sahip } from '../cekirdek/kayit.js';
 import { canHarca } from './joker.js';
 import { hayaletBasla, hayaletTemizle, hayaletSakla } from './hayalet.js';
 import { gunTazele, gunSonuc, gunTohumu } from './gunluk.js';
+import { hedefBitis } from './hedef.js';
 import { jokerSesi, gicirtiGuncelle, tikSesi, muzikHazirla } from '../cekirdek/ses.js';
 import * as E from '../cekirdek/dom.js';
 import { goster, gizle, sonEkrani, cuzdanTazele } from '../ui/ekranlar.js';
@@ -111,6 +112,15 @@ export function surdur(){
 }
 
 export function bitir(d){
+  // Hayalet dünyası da fizik.adim'dan geçiyor ve yere değince buraya
+  // geliyor. İlk sürümde bu satır YOKTU: kayıtlı tur bir boşluğa düşerek
+  // bittiyse (en sık ölüm), hayalet yere değdiği anda OYUNCUNUN turu
+  // bitiyordu — durum.hal='son', skor hayaletinki. Zincir kopması ya da
+  // tepeden düşmeyle biten kayıtlarda hayalet düşüş fazında durduğu için
+  // (hayalet.js) yere hiç değmiyordu; testler yalnız onları kapsamıştı.
+  // Kural: bu fonksiyon GLOBAL durumu değiştiriyor, yalnız oyuncunun
+  // dünyası için çalışmalı.
+  if(d.hayaletMi){ d.faz='bitti'; return; }
   if(d.ogretici){ ogreticiDus(d); return; }   // öğreticide ölüm yok
   d.faz='bitti'; durum.hal='son';
   const nihai = nihaiSkor(d);
@@ -121,6 +131,7 @@ export function bitir(d){
   // "daha iyi mi" diye bakıyor. hayaletSakla jokerli turu kendisi eliyor.
   d.yeniHayalet = hayaletSakla(d, nihai);
   d.gunlukRekor = d.gunluk ? gunSonuc(nihai) : false;
+  hedefBitis(d);                      // ikisine de bakıyor: hayaleti geçtin mi, gün serisi
 
   // Toplanan para bankaya. Can kullanılıp tur sürerse aynı paralar ikinci
   // kez yatmasın diye yalnız fark yatırılıyor.

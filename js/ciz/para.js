@@ -39,3 +39,21 @@ export function paraPop(d, sx, sy){
   X.fillText('+1 \u25C6', sx, sy - 56 - yas*22);
   X.textAlign='left'; X.globalAlpha=1;
 }
+
+// İrtifa ödemesi (fizik.irtifaParasi): tutunma anında OYUNCUNUN ALTINDA.
+// Üstü dolu: mesaj yazısı sy-48, +1 ◆ sy-56, seri alevi sy-52'den yukarı.
+// Aşağı doğru süzülüyor — yukarı çıkan yazılardan ayrışsın, "düşen para".
+export function irtifaPop(d, sx, sy){
+  const yas = d.t - d.irtifaT;
+  if(!(d.irtifa>0) || yas < 0 || yas > 1.3) return;
+  const buyu = yas < .18 ? 1 + (1-yas/.18)*.45 : 1;
+  X.globalAlpha = yas < 1 ? 1 : 1-(yas-1)/.3;
+  X.textAlign='center';
+  X.font = '800 '+Math.round(17*buyu)+'px system-ui';
+  X.lineWidth = 3.4; X.strokeStyle = 'rgba(12,8,24,.85)';
+  const y = sy + 34 + yas*14;
+  X.strokeText('+'+d.irtifa+' ◆', sx, y); X.fillStyle = RENK; X.fillText('+'+d.irtifa+' ◆', sx, y);
+  X.font = '600 11px system-ui';
+  X.strokeText('irtifa', sx, y+15); X.fillStyle = '#F5D78A'; X.fillText('irtifa', sx, y+15);
+  X.textAlign='left'; X.globalAlpha=1;
+}
