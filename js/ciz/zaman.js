@@ -78,7 +78,7 @@ function havaYenile(d){
 // hesabın aynısı, burada TEKRAR edilmesinin sebebi ciz/ modüllerinin
 // birbirine parametre yerine `d`'den bağımsız türetmesi (bkz. §6.5:
 // katmanlar.js/zemin.js de bolgeNo(d.i)'yi kendileri çağırıyor).
-function bolgeKarisimi(d){
+export function bolgeKarisimi(d){
   const p = d.faz==='salinim' ? oturX(d.sal[d.i]) : d.px;
   const s0=d.sal[d.i], s1=d.sal[d.i+1]||s0;
   const t=kis((p-s0.x)/Math.max(1,s1.x-s0.x),0,1);

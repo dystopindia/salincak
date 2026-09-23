@@ -4,6 +4,7 @@ import { durum } from '../oyun/durum.js';
 import { JOKER, satinAl } from '../oyun/joker.js';
 import { kayit, sahip, sakla } from '../cekirdek/kayit.js';
 import { gunTazele } from '../oyun/gunluk.js';
+import { efektKapat } from '../ciz/sonisleme.js';
 import { HEDEF, IZLER, hedefTamam, hedefSayisi, izAcik, seciliIz, izSec } from '../oyun/hedef.js';
 import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi } from '../cekirdek/ses.js';
 
@@ -111,6 +112,8 @@ export function ayarlarKur(){
       b.setAttribute('aria-pressed', kayit.surekli?'true':'false'));
     document.querySelectorAll('[data-hayalet]').forEach(b=>
       b.setAttribute('aria-pressed', kayit.hayaletAcik?'true':'false'));
+    document.querySelectorAll('[data-efekt]').forEach(b=>
+      b.setAttribute('aria-pressed', kayit.efekt?'true':'false'));
   };
   document.querySelectorAll('[data-ses]').forEach(b=>{
     b.onclick=()=>{
@@ -130,6 +133,11 @@ export function ayarlarKur(){
   });
   document.querySelectorAll('[data-hayalet]').forEach(b=>{
     b.onclick=()=>{ kayit.hayaletAcik=!kayit.hayaletAcik; sakla(); yansit(); tikSesi(); };
+  });
+  // Işık efektleri: kapatınca 2D tuval hemen görünür (duraklat ekranında
+  // bir sonraki kare hiç çizilmeyebilir); açınca ilk çizilen karede geri gelir.
+  document.querySelectorAll('[data-efekt]').forEach(b=>{
+    b.onclick=()=>{ kayit.efekt=!kayit.efekt; sakla(); if(!kayit.efekt) efektKapat(); yansit(); tikSesi(); };
   });
   yansit();
 }

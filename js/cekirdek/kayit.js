@@ -14,6 +14,7 @@ export const kayit = {
   surekli: false,    // ölünce otomatik yeniden başlasın mı (Geometry Dash tarzı)
   ogretici: false,   // öğretici bir kez tamamlandı ya da geçildi mi
   hayaletAcik: true, // rekor hayaleti gösterilsin mi (ayarlar anahtarı)
+  efekt: true,       // WebGL ışık efektleri (ciz/sonisleme.js) — yavaş telefonda kapatılabilsin
   hedef: {},         // tamamlanan ustalık hedefleri: { hedefId: true } (oyun/hedef.js)
   iz: 'yok',         // seçili uçuş izi (ciz/iz.js); açık olup olmadığını hedef.js bilir
   joker: {},        // { jokerId: adet }
@@ -52,6 +53,7 @@ export function yukle(){
     if(typeof o.surekli === 'boolean') kayit.surekli = o.surekli;
     if(typeof o.ogretici === 'boolean') kayit.ogretici = o.ogretici;
     if(typeof o.hayaletAcik === 'boolean') kayit.hayaletAcik = o.hayaletAcik;
+    if(typeof o.efekt === 'boolean') kayit.efekt = o.efekt;
     if(o.hedef && typeof o.hedef === 'object')
       for(const k in o.hedef) if(o.hedef[k]===true) kayit.hedef[k]=true;
     if(typeof o.iz === 'string') kayit.iz = o.iz;

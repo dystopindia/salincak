@@ -4,6 +4,7 @@ import { durum } from './oyun/durum.js';
 import { adim, yavaslamaFaktoru } from './oyun/fizik.js';
 import { baglaGirdi } from './oyun/girdi.js';
 import { ciz } from './ciz/sahne.js';
+import { sonIsle } from './ciz/sonisleme.js';
 import { hudG } from './ui/hud.js';
 import { kimlikKur, dukkanKur, ayarlarKur } from './ui/ekranlar.js';
 import { kayit, yukle } from './cekirdek/kayit.js';
@@ -53,7 +54,9 @@ function dongu(su){
     // 'duraklat' hâlinde çizim de duruyor — ekran son karede donuyor,
     // dondurulmuş bir karenin üstünde kamera/uzuvların akmaya devam etmesi
     // "duraklatılmış" hissini bozardı.
-    if(durum.hal!=='duraklat') ciz(d, dt);
+    // Son işleme (WebGL bloom + derece) her çizilen karenin hemen ardından;
+    // kapalıysa ya da WebGL yoksa hiçbir şey yapmadan dönüyor (ciz/sonisleme.js).
+    if(durum.hal!=='duraklat'){ ciz(d, dt); sonIsle(d); }
   }
   // Müzik oyunda ve duraklatmada çalıyor, menü/bitişte sönüyor. Bölge
   // değişince cümle de değişiyor (ses.js, ölçü başında).
