@@ -1,5 +1,6 @@
 import { X } from '../cekirdek/tuval.js';
 import { parlaklik } from '../cekirdek/matematik.js';
+import { spriteVar, spriteCiz } from './sprite.js';
 
 // Yerel çerçeve: kalça (0,0), y AŞAĞI, birim ≈ px. aci DAİMA −θ ile gelir
 // (bkz. CLAUDE.md §1). +θ verirsen figür ipin ters tarafına yatar.
@@ -111,8 +112,12 @@ function hayaletSekil(c){
   X.closePath(); X.fill();
 }
 
+// poz: 'otur' | 'ayakta' | 'ucus' | 'uzan'. Resmi olan karakter (sprite.js)
+// dört pozu ayrı çiziyor; kod çizimi yalnız "oturuyor mu" ayrımını biliyor.
 // isik: { x, y, g, renk } — ekran uzayında birim yön + güç. null olabilir.
-export function karakter(sx,sy,aci,ayakta,k,isik){
+export function karakter(sx,sy,aci,poz,k,isik){
+  if(spriteVar(k)){ spriteCiz(sx,sy,aci,poz,k,isik); return; }
+  const ayakta = poz!=='otur';
   const c = k.id==='hayalet' ? 'rgba(233,229,242,.78)' : '#F5EFE2';
   const ciz = duz => {
     if(k.id==='hayalet') hayaletSekil(duz?isik.renk:c);

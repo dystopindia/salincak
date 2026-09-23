@@ -9,6 +9,7 @@ import { zemin } from './zemin.js';
 import { uzak, orta, on } from './katmanlar.js';
 import { iskelet, zincirCiz } from './salincak.js';
 import { karakter } from './karakter.js';
+import { spriteVar, elAraligi } from './sprite.js';
 import { isiklar, kenarIsik } from './isik.js';
 import { uzuv } from './uzuv.js';
 import { paraCiz, paraPop, irtifaPop } from './para.js';
@@ -47,7 +48,7 @@ export function ciz(d, dt=1/60){
     if(s.x < kamX-W/(PM*2)-4) continue;
     if(s.x > kamX+W/(PM*2)+4) break;
     iskelet(s, j===d.i);
-    zincirCiz(s, j===d.i && d.faz==='salinim');
+    zincirCiz(s, j===d.i && d.faz==='salinim', elAraligi(d.k));
   }
 
   isiklar(d,bz);     // 'lighter' — altındaki her şeyi aydınlatıyor
@@ -92,8 +93,10 @@ export function ciz(d, dt=1/60){
     X.stroke(); X.setLineDash([]);
 
     const o=ekr(oturX(s),oturY(s));
-    karakter(o.sx,o.sy,-s.th,s.poz==='ayakta',d.k,kenarIsik(d,oturX(s),oturY(s)));
-    uzuv(d,dt,o.sx,o.sy,-s.th,yer(d),ruzg(d));   // karakterden SONRA, yoksa gövdenin altında kalıyor
+    karakter(o.sx,o.sy,-s.th,s.poz==='ayakta'?'ayakta':'otur',d.k,kenarIsik(d,oturX(s),oturY(s)));
+    // Verlet atkı/kuyruk yalnız kod çiziminde: resimli karakterin atkısı
+    // resmin içinde, ikinci bir atkı çizmek iki atkı demek.
+    if(!spriteVar(d.k)) uzuv(d,dt,o.sx,o.sy,-s.th,yer(d),ruzg(d));   // karakterden SONRA, yoksa gövdenin altında kalıyor
   } else {
     const q=ekr(p.x,p.y);
     if(d.uzanma>0){
@@ -101,8 +104,9 @@ export function ciz(d, dt=1/60){
       X.beginPath(); X.arc(q.sx,q.sy,tutunmaR(d)*PM,0,6.3); X.stroke();
     }
     izCiz(d);          // uçuş izi — karakterin ARKASINDA (ciz/iz.js)
-    karakter(q.sx,q.sy,d.don,true,d.k,kenarIsik(d,p.x,p.y));
-    uzuv(d,dt,q.sx,q.sy,d.don,yer(d),ruzg(d));
+    const poz=ucusPozu(d), aci=ucusAcisi(d,poz);
+    karakter(q.sx,q.sy,aci,poz,d.k,kenarIsik(d,p.x,p.y));
+    if(!spriteVar(d.k)) uzuv(d,dt,q.sx,q.sy,d.don,yer(d),ruzg(d));
   }
 
   { const o=ekr(p.x,p.y); seriCiz(d,o.sx,o.sy); }   // alevli seri sayacı
@@ -145,7 +149,8 @@ function hayaletCiz(d){
   const y = h.faz==='salinim' ? oturY(h.sal[h.i]) : h.py;
   if(x < kamX-W/(PM*2)-3 || x > kamX+W/(PM*2)+3) return;   // ekran dışıysa çizme
   const q = ekr(x,y);
-  const aci = h.faz==='salinim' ? -h.sal[h.i].th : h.don;
+  const pz = h.faz==='salinim' ? (h.sal[h.i].poz==='ayakta'?'ayakta':'otur') : ucusPozu(h);
+  const aci = h.faz==='salinim' ? -h.sal[h.i].th : ucusAcisi(h,pz);
   X.save();
   // Soğuk hale: figürün kendisi oyuncuyla AYNI renkte çiziliyor (aynı
   // karakter çizimi), onu ayıran şey bu hale ve düşük alfa. Halesiz bir
@@ -156,6 +161,14 @@ function hayaletCiz(d){
   g.addColorStop(1, renkA(HAY_RENK,0));
   X.fillStyle=g; X.beginPath(); X.arc(q.sx,q.sy-13,26,0,6.3); X.fill();
   X.globalAlpha = alfa;
-  karakter(q.sx, q.sy, aci, h.faz==='salinim' && h.sal[h.i].poz==='ayakta', h.k, null);
+  karakter(q.sx, q.sy, aci, pz, h.k, null);
   X.restore();
+}
+
+// Havada: uzanırken 'uzan', yoksa 'ucus'. Uzanma pozu dönmüyor, uçuş YÖNÜNE
+// bakıyor — kollar gidilen yöne uzansın (resim sağa bakıyor, +x). Kod
+// çiziminde uzanma ayrı bir poz değil, eskisi gibi takla atmaya devam.
+function ucusPozu(d){ return d.uzanma>0 ? 'uzan' : 'ucus'; }
+function ucusAcisi(d, poz){
+  return poz==='uzan' && spriteVar(d.k) ? Math.atan2(-d.vy, d.vx) : d.don;
 }

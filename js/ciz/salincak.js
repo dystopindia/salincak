@@ -46,10 +46,16 @@ function zincirTeli(pv,ot,halkaBoy,renk,kalinlik){
 // (karakter.js/kol).
 const ZAYRIM = .157;                                   // yarı açıklık (m)
 
-export function zincirCiz(s,aktif){
+// elPx: resimli karakterin yumruk aralığı (sprite.elAraligi, ekran px) ya
+// da null. Resimdeki yumruklar başın iki yanında, eski metrik aralıktan
+// (±0.157 m = telefonda ±3-5 px) çok daha geniş; zincirler onların içinden
+// geçmezse "zinciri tutuyor" görüntüsü bozulur. Resimli aralık oturak
+// çubuğunun ucuna (±12 px) denk geliyor — gerçek salıncakta da zincir oraya bağlı.
+export function zincirCiz(s,aktif,elPx=null){
   const pv=ekr(s.x,s.py), ot=ekr(oturX(s),oturY(s)), k=kis(s.yorgun,0,1);
   // ayrım yönü oturak çubuğunun ekseni: rotate(-θ) altında yerel x
-  const dx=Math.cos(s.th)*ZAYRIM*PM, dy=-Math.sin(s.th)*ZAYRIM*PM;
+  const ay=elPx!=null ? elPx : ZAYRIM*PM;
+  const dx=Math.cos(s.th)*ay, dy=-Math.sin(s.th)*ay;
   const renk=aktif?'rgb('+Math.round(90+121*k)+',81,'+Math.round(144-33*k)+')':'#453E75';
   const kalinlik=aktif?1.8-k*.6:1.2;
   const halkaBoy=aktif?lerp(HALKA_TABAN,HALKA_GERGIN,k):HALKA_UZAK;
