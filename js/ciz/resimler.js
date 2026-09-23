@@ -16,3 +16,9 @@ export const ISKELET = { dosya:'resim/iskelet.webp',
     {x:582,y:0,w:286,h:296,px:142.8,py:51.8,ty:294.7,fx:239.4,fy:106.4},
     {x:870,y:0,w:282,h:296,px:140.7,py:51.1,ty:293.3,fx:242.2,fy:102.2},
     {x:1154,y:0,w:287,h:296,px:142.8,py:50.4,ty:293.3,fx:241.5,fy:102.2} ] };
+
+// Boyalı arka plan katmanları, bölge numarasıyla. Kenarları harmanlanmış,
+// yatayda kesintisiz tekrar ediyor. alt: taban rengi (altı bununla doluyor).
+export const BOYALI = {
+  0: { uzak:{dosya:'resim/park-uzak.webp',w:2132,h:261,alt:'#6e8d91'}, orta:{dosya:'resim/park-orta.webp',w:1492,h:293,alt:'#375266'}, on:{dosya:'resim/park-on.webp',w:1279,h:119,alt:'#1b1638'} }
+};

@@ -4,6 +4,7 @@ import { nz, kis, renkKar, renkA, parlaklik } from '../cekirdek/matematik.js';
 import { BOL } from '../oyun/tanimlar.js';
 import { ruzg } from '../oyun/fizik.js';
 import { mevsimGoster, mevsimBoya, gunEvresi } from './zaman.js';
+import { boyaliVar, boyaliCiz } from './boyali.js';
 
 // Atmosferik perspektif iki eksende: zemin→ufuk sis karışımı + parlaklık.
 // Sonuç sırası (açıktan koyuya): en uzak · uzak sırt · gökyüzü · zemin ·
@@ -251,7 +252,15 @@ export function uzak(d,b){
   const gece=1-gunGuc;
   const enUzak=sis(b,...ENUZAK,mevsim), uzakR=sis(b,...UZAK,mevsim);
 
-  if(b===0){                               // park: şehir ufku + dönme dolap, önünde tepe sırtı
+  // Boyalı katman varsa (ciz/boyali.js): resim tepe sırtının ve şehrin
+  // yerine geçiyor. Dönen dolap kodda kalıyor — resmin ARKASINDA, şehrin
+  // üstünden görünüyor; resim sabit, dolap dönüyor.
+  if(b===0 && boyaliVar(0,'uzak')){
+    X.strokeStyle=enUzak; X.fillStyle=enUzak;
+    donmeDolap(K_ENUZAK,2.0,5.1,1.7,d.t);
+    boyaliCiz(0,'uzak',gece,d);
+  }
+  else if(b===0){                          // park: şehir ufku + dönme dolap, önünde tepe sırtı
     X.fillStyle=enUzak;
     sehir(K_ENUZAK,1.1,2.3,3.4,500);
     pencereler(K_ENUZAK,1.1,2.3,3.4,500,B.lamba,gece);
@@ -304,6 +313,7 @@ export function orta(d,b){
   const k=KATMAN.orta, mevsim=mevsimGoster(d), B=BOL[b];
   const renk=sis(b,...ORTA,mevsim);
   X.fillStyle=renk;
+  if(b===0 && boyaliVar(0,'orta')){ boyaliCiz(0,'orta',1-gunEvresi(d,B.gunEtki).gunGuc,d); return; }
   if(b===0){                               // park: ağaç taçları, önünde çit
     taclar(k,2.0,.35,1.6,40);
     const {sol,sag}=pencere(k,.55), cit=parlaklik(renk,1.55);
@@ -356,6 +366,8 @@ export function on(d,b){
   // otlar rüzgârın yönüne yatıyor, iplikler o yöne savruluyor. Aynı
   // `ruzg(d)` değerinden geliyor — çizgilerle hep aynı yöne bakıyorlar.
   const ruz=ruzg(d), siddet=Math.min(1,Math.abs(ruz)/2.2);
+  // Boyalı ön plan rüzgâra yatmayı kendisi yapıyor (boyali.js, eğim).
+  if(b===0 && boyaliVar(0,'on')){ boyaliCiz(0,'on',1-gunEvresi(d,BOL[b].gunEtki).gunGuc,d); return; }
 
   if(b>=2){                                 // savrulan iplikler (bulutlar ve ötesi)
     X.strokeStyle=BOL[b].on; X.globalAlpha=.55; X.lineWidth=2.5; X.lineCap='round';
