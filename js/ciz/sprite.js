@@ -24,6 +24,9 @@ for(const id in RESIM){
 }
 
 export const spriteVar = k => !!(k && RES[k.id] && RES[k.id].hazir);
+// Parkur pozları (kosu1-4, zipla, inis) karakter karakter geliyor; olmayan
+// karakter koşuyu eski yoldan çiziyor (ayakta pozu sekerek, sahne.js).
+export const pozVar = (k, poz) => spriteVar(k) && !!RES[k.id].pozlar[poz];
 
 // Zincirlerin oturak ekseninde geçtiği yer (ekran px). Kod çizimi için null:
 // salincak.zincirCiz eski metrik aralığı (ZAYRIM) kullanıyor.

@@ -1,6 +1,6 @@
 // derle.py tarafindan uretildi — elle duzenleme, derlemede uzerine yazilir.
 // Dosya listesi derle.py'deki SIRA'dan turetiliyor.
-const SURUM = 'salincak-cc41b39e27';
+const SURUM = 'salincak-eee030c002';
 const DOSYALAR = [
   './',
   'index.html',
@@ -53,22 +53,23 @@ const DOSYALAR = [
   'js/ciz/sonisleme.js',
   'js/ui/hud.js',
   'js/main.js',
-  'resim/astronot.png',
+  'resim/astronot.webp',
   'resim/bulutlar-on.webp',
   'resim/bulutlar-orta.webp',
   'resim/bulutlar-uzak.webp',
   'resim/buz-on.webp',
   'resim/buz-orta.webp',
   'resim/buz-uzak.webp',
-  'resim/cocuk.png',
-  'resim/hayalet.png',
+  'resim/cocuk.webp',
+  'resim/hayalet.webp',
   'resim/iskelet.webp',
-  'resim/kedi.png',
+  'resim/kedi.webp',
   'resim/orman-on.webp',
   'resim/orman-orta.webp',
   'resim/orman-uzak.webp',
   'resim/park-on.webp',
   'resim/park-orta.webp',
+  'resim/park-parkur.webp',
   'resim/park-uzak.webp',
   'resim/yorunge-on.webp',
   'resim/yorunge-orta.webp',

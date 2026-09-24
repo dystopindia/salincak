@@ -3,13 +3,13 @@
 // yumrukların dönme noktasından yatay uzaklığı (ekran px), zincirler
 // buradan geçiyor; ox/oy: pozun dönme noktası, atlas px.
 export const RESIM = {
-  cocuk: { dosya:'resim/cocuk.png', depo:2.25, el:11.2, alfa:1,
-    pozlar:{ otur:{x:0,y:0,w:75,h:101,ox:42.6,oy:84.5}, ayakta:{x:77,y:0,w:75,h:115,ox:44.4,oy:112.5}, ucus:{x:154,y:0,w:79,h:96,ox:45.7,oy:52.3}, uzan:{x:235,y:0,w:93,h:107,ox:41.8,oy:55.2} } },
-  kedi: { dosya:'resim/kedi.png', depo:2.25, el:12.0, alfa:1,
+  cocuk: { dosya:'resim/cocuk.webp', depo:2.25, el:11.2, alfa:1,
+    pozlar:{ otur:{x:0,y:0,w:75,h:101,ox:42.6,oy:84.5}, ayakta:{x:77,y:0,w:75,h:115,ox:44.4,oy:112.5}, ucus:{x:154,y:0,w:79,h:96,ox:45.7,oy:52.3}, uzan:{x:235,y:0,w:93,h:107,ox:41.8,oy:55.2}, kosu1:{x:330,y:0,w:82,h:107,ox:52.0,oy:107.3}, kosu2:{x:414,y:0,w:84,h:101,ox:53.8,oy:101.0}, kosu3:{x:500,y:0,w:84,h:107,ox:54.8,oy:106.5}, kosu4:{x:586,y:0,w:84,h:106,ox:53.9,oy:105.6}, zipla:{x:672,y:0,w:99,h:111,ox:54.7,oy:55.4}, inis:{x:773,y:0,w:100,h:102,ox:59.0,oy:101.5} } },
+  kedi: { dosya:'resim/kedi.webp', depo:2.25, el:12.0, alfa:1,
     pozlar:{ otur:{x:0,y:0,w:81,h:95,ox:47.1,oy:83.0}, ayakta:{x:83,y:0,w:80,h:105,ox:46.3,oy:103.9}, ucus:{x:165,y:0,w:73,h:89,ox:44.0,oy:48.7}, uzan:{x:240,y:0,w:96,h:98,ox:52.5,oy:50.7} } },
-  astronot: { dosya:'resim/astronot.png', depo:2.25, el:12.1, alfa:1,
+  astronot: { dosya:'resim/astronot.webp', depo:2.25, el:12.1, alfa:1,
     pozlar:{ otur:{x:0,y:0,w:75,h:103,ox:41.0,oy:82.4}, ayakta:{x:77,y:0,w:70,h:111,ox:37.8,oy:110.3}, ucus:{x:149,y:0,w:72,h:95,ox:41.2,oy:53.7}, uzan:{x:223,y:0,w:92,h:103,ox:46.9,oy:53.7} } },
-  hayalet: { dosya:'resim/hayalet.png', depo:2.25, el:12.0, alfa:0.82,
+  hayalet: { dosya:'resim/hayalet.webp', depo:2.25, el:12.0, alfa:0.82,
     pozlar:{ otur:{x:0,y:0,w:71,h:94,ox:38.2,oy:87.3}, ayakta:{x:73,y:0,w:69,h:100,ox:35.6,oy:97.6}, ucus:{x:144,y:0,w:60,h:90,ox:30.5,oy:46.7}, uzan:{x:206,y:0,w:90,h:93,ox:40.4,oy:48.5} } }
 };
 
@@ -31,4 +31,13 @@ export const BOYALI = {
   2: { uzak:{dosya:'resim/bulutlar-uzak.webp',w:1900,h:333,alt:'#e6c9ef'}, orta:{dosya:'resim/bulutlar-orta.webp',w:1464,h:286,alt:'#b47ad5'}, on:{dosya:'resim/bulutlar-on.webp',w:1090,h:127,alt:'#1d1639'} },
   3: { uzak:{dosya:'resim/yorunge-uzak.webp',w:2151,h:280,alt:'#6278ba'}, orta:{dosya:'resim/yorunge-orta.webp',w:1506,h:267,alt:'#3f4d6d'}, on:{dosya:'resim/yorunge-on.webp',w:1218,h:142,alt:'#0e0f28'} },
   4: { uzak:{dosya:'resim/buz-uzak.webp',w:1767,h:255,alt:'#79c8f4'}, orta:{dosya:'resim/buz-orta.webp',w:1444,h:258,alt:'#057ed1'}, on:{dosya:'resim/buz-on.webp',w:1204,h:140,alt:'#10163c'} }
+};
+
+// Parkur parçaları (§12): blok 9 dilim — kapak: üst şerit yüksekliği, sol/sag:
+// uç parçaların genişliği; pxm: atlas px / dünya metresi. tramb: dinlenen ve
+// basılmış hâl, aynı tabanda; ust: sekme yüzeyinin tepeden uzaklığı.
+export const PARKUR_RESIM = {
+  0: { dosya:'resim/park-parkur.webp', pxm:87.1,
+    blok:{x:0,y:0,w:679,h:103,kapak:39.2,sol:26.4,sag:26.8,alt:7.7},
+    tramb:[{x:0,y:105,w:321,h:110},{x:323,y:105,w:321,h:110}], ust:14.3 }
 };

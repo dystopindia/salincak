@@ -10,7 +10,7 @@ import { zemin } from './zemin.js';
 import { uzak, orta, on } from './katmanlar.js';
 import { iskelet, zincirCiz } from './salincak.js';
 import { karakter } from './karakter.js';
-import { spriteVar, elAraligi } from './sprite.js';
+import { spriteVar, elAraligi, pozVar } from './sprite.js';
 import { isiklar, kenarIsik } from './isik.js';
 import { uzuv } from './uzuv.js';
 import { paraCiz, paraPop, irtifaPop } from './para.js';
@@ -115,11 +115,20 @@ export function ciz(d, dt=1/60){
     // resmin içinde, ikinci bir atkı çizmek iki atkı demek.
     if(!spriteVar(d.k)) uzuv(d,dt,o.sx,o.sy,-s.th,yer(d),ruzg(d));   // karakterden SONRA, yoksa gövdenin altında kalıyor
   } else if(d.faz==='kosu'){
-    // Koşu: resimde koşu pozu henüz yok — 'ayakta' pozu adım ritminde
-    // hafifçe sekiyor ve öne eğiliyor. Pivot ayak tabanı, d.py de öyle.
-    const q=ekr(p.x,p.y), adimF=d.t*d.vx*2.2;
-    const sek=Math.abs(Math.sin(adimF))*2.2, egim=.10+Math.sin(adimF*2)*.03;
-    karakter(q.sx,q.sy-sek,egim,'ayakta',d.k,kenarIsik(d,p.x,p.y+.5));
+    // Koşu: 4 karelik döngü, kare MESAFEDEN (KOSU_KARE m'de bir) — hız
+    // değişince adım da kendiliğinden hızlanıyor, zamana bağlı sayaç yok.
+    // İnişten hemen sonra kısa bir çömelme. Pivot ayak tabanı, d.py de öyle.
+    // Koşu karesi olmayan karakter: 'ayakta' pozu adım ritminde sekiyor.
+    const q=ekr(p.x,p.y), isik=kenarIsik(d,p.x,p.y+.5);
+    if(pozVar(d.k,'kosu1')){
+      const poz = d.t-(d.inisT??-9) < INIS_SURE && pozVar(d.k,'inis') ? 'inis'
+                : 'kosu'+(1+Math.floor(d.px/KOSU_KARE)%4);
+      karakter(q.sx,q.sy,0,poz,d.k,isik);
+    } else {
+      const adimF=d.t*d.vx*2.2;
+      const sek=Math.abs(Math.sin(adimF))*2.2, egim=.10+Math.sin(adimF*2)*.03;
+      karakter(q.sx,q.sy-sek,egim,'ayakta',d.k,isik);
+    }
   } else {
     const q=ekr(p.x,p.y);
     if(d.uzanma>0){
@@ -191,11 +200,19 @@ function hayaletCiz(d){
 // Havada: uzanırken 'uzan', yoksa 'ucus'. Uzanma pozu dönmüyor, uçuş YÖNÜNE
 // bakıyor — kollar gidilen yöne uzansın (resim sağa bakıyor, +x). Kod
 // çiziminde uzanma ayrı bir poz değil, eskisi gibi takla atmaya devam.
-function ucusPozu(d){ return d.uzanma>0 ? 'uzan' : 'ucus'; }
+const KOSU_KARE = .32, INIS_SURE = .11;
+function ucusPozu(d){
+  if(d.uzanma>0) return 'uzan';
+  // Bloktan zıplayış: yükselirken zıplama pozu (gövde ortasından çiziliyor,
+  // uçuştaki d.py ile aynı nokta). İnişe geçince eskisi gibi 'ucus'.
+  if(d.kaynak==='blok' && d.vy>-1 && pozVar(d.k,'zipla')) return 'zipla';
+  return 'ucus';
+}
 function ucusAcisi(d, poz){
   if(poz==='uzan' && spriteVar(d.k)) return Math.atan2(-d.vy, d.vx);
   // Bloktan zıplayış kısa bir sekme: takla değil, hafif eğilme. Takla
   // salıncaktan ve trambolinden fırlayınca (d.kaynak, oyun/engel.js).
+  if(poz==='zipla') return 0;
   if(d.kaynak==='blok') return kis(-d.vy*.03, -.25, .25) + .08;
   return d.don;
 }

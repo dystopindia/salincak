@@ -7,6 +7,87 @@ import { X, W } from '../cekirdek/tuval.js';
 import { ekr, PM } from '../cekirdek/kamera.js';
 import { renkKar, kis } from '../cekirdek/matematik.js';
 import { BOL } from '../oyun/tanimlar.js';
+import { PARKUR_RESIM } from './resimler.js';
+
+// --- resimli parçalar (sprite.py, assets/parkur/) -------------------------
+// Resmi olan bölge resimle, olmayan aşağıdaki kod çizimiyle — bölgeler tek
+// tek geçebiliyor (karakterler ve boyalı katmanlarla aynı kural).
+// Gece: resim gündüz renkleriyle; üstüne bölgenin gece tonunda düz bir
+// silüet, gündüz eğrisiyle binen alfayla (iskeletlerin gece perdesi, §6.16).
+const PARKUR_GECE = .62;
+const PR = {};
+for(const b in PARKUR_RESIM){
+  const r = PARKUR_RESIM[b], img = new Image();
+  const g = { ...r, img, hazir:false, perde:null };
+  img.onload = ()=>{
+    const t = document.createElement('canvas');
+    t.width = img.width; t.height = img.height;
+    const c = t.getContext('2d');
+    c.drawImage(img, 0, 0);
+    c.globalCompositeOperation = 'source-in';
+    const B = BOL[b];
+    c.fillStyle = renkKar(B.on, B.gok[1], .5); c.fillRect(0, 0, t.width, t.height);
+    g.perde = t; g.hazir = true;
+  };
+  img.src = r.dosya;
+  PR[b] = g;
+}
+
+// Blok, 9 dilim: uçlar ve kapak olduğu gibi, orta sütunlar yatayda, gövde
+// satırları düşeyde tekrar ediyor; alt kenar yalnız en dipte. Dilim kenarları
+// yarım piksel bindiriliyor — yoksa ölçeklenen komşu dilimler arasında ince
+// bir boşluk parlıyor.
+function blokResim(kaynak, R, x, y, w, h){
+  const B = R.blok, s = PM / R.pxm;
+  let sol = B.sol*s, sag = B.sag*s;
+  if(sol+sag > w){ const k = w/(sol+sag); sol*=k; sag*=k; }
+  const kap = Math.min(B.kapak*s, h), altH = Math.min(B.alt*s, Math.max(0, h-kap));
+  const ortaK = B.w - B.sol - B.sag;                 // kaynakta orta sütunlar
+  const govK = B.h - B.kapak - B.alt;                // kaynakta tekrar eden gövde
+  // bir satır: kaynaktaki [sy, sy+sh) dilimini hedefte [dy, dy+dh)'ye, üç sütunla
+  const satir = (sy, sh, dy, dh)=>{
+    X.drawImage(kaynak, B.x, B.y+sy, B.sol, sh, x, dy, sol+.5, dh+.5);
+    X.drawImage(kaynak, B.x+B.w-B.sag, B.y+sy, B.sag, sh, x+w-sag-.5, dy, sag+.5, dh+.5);
+    const adim = ortaK*s;
+    for(let ox = sol; ox < w-sag; ox += adim){
+      const dw = Math.min(adim, w-sag-ox);
+      X.drawImage(kaynak, B.x+B.sol, B.y+sy, ortaK*dw/adim, sh, x+ox, dy, dw+.5, dh+.5);
+    }
+  };
+  satir(0, B.kapak, y, kap);
+  const gAdim = govK*s;
+  for(let oy = kap; oy < h-altH-.5; oy += gAdim){
+    const dh = Math.min(gAdim, h-altH-oy);
+    satir(B.kapak, govK*dh/gAdim, y+oy, dh);
+  }
+  if(altH > 0) satir(B.h-B.alt, B.alt, y+h-altH, altH);
+}
+
+// Trambolin: genişlik fizikteki genişlik; yükseklik sekme yüzeyi e.ust'e
+// otursun diye. En-boy oranı en çok %15 basılıyor — daha fazlası basık
+// görünüyor; kalan fark bacakların yerin biraz altına inmesiyle kapanıyor.
+function trambolinResim(kaynak, R, d, e){
+  const bas = d.sekE===e && d.t-d.sekT < .16 ? 1 : 0;
+  const T = R.tramb[bas];
+  const sx = (e.x1-e.x0)*PM / T.w;
+  const sy = Math.max(e.ust*PM / (T.h - R.ust), sx*.85);
+  const q = ekr(e.x0, e.ust);
+  X.drawImage(kaynak, T.x, T.y, T.w, T.h, q.sx, q.sy - R.ust*sy, T.w*sx, T.h*sy);
+}
+
+function resimliCiz(d, R, e, gece){
+  X.imageSmoothingQuality = 'high';
+  const katman = (kaynak)=>{
+    if(e.tip==='blok'){
+      const a=ekr(e.x0, e.ust), z=ekr(e.x1, e.alt);
+      blokResim(kaynak, R, a.sx, a.sy, z.sx-a.sx, z.sy-a.sy);
+    } else trambolinResim(kaynak, R, d, e);
+  };
+  katman(R.img);
+  if(gece > .02){
+    X.save(); X.globalAlpha = gece*PARKUR_GECE; katman(R.perde); X.restore();
+  }
+}
 
 const BLOK_RENK = [
   ['#5B4A8C', '#F2B33D'],   // park: oyun parkı moru, kehribar kenar
@@ -22,12 +103,15 @@ export function engelCiz(d, b, gece){
   const govde = renkKar(gRenk, BOL[b].on, gece*.5);
   const kapak = renkKar(kRenk, BOL[b].on, gece*.25);
   const kenar = BOL[b].on;
+  const R = PR[b] && PR[b].hazir ? PR[b] : null;
   for(const e of d.engel){
     const a=ekr(e.x0, e.ust), z=ekr(e.x1, 0);
     if(z.sx < -20) continue;
     if(a.sx > W+20) break;
-    if(e.tip==='blok') blok(e, a, z, govde, kapak, kenar);
+    if(R) resimliCiz(d, R, e, gece);
+    else if(e.tip==='blok') blok(e, a, z, govde, kapak, kenar);
     else trambolin(d, e, govde, kapak, kenar);
+    if(e.tip==='trambolin') superHalka(d, e);
   }
 }
 
@@ -81,7 +165,11 @@ function trambolin(d, e, govde, kapak, kenar){
   X.strokeStyle=kapak; X.lineWidth=Math.max(4, PM*.12);
   X.beginPath(); X.moveTo(s0.sx, s0.sy); X.lineTo(s1.sx, s1.sy); X.stroke();
   X.lineCap='butt';
-  // süper sekme: kısa bir halka
+}
+
+// Süper sekme: kısa bir halka — resimli ve kod çizimli trambolinde ortak.
+function superHalka(d, e){
+  const s0=ekr(e.x0, e.ust), s1=ekr(e.x1, e.ust);
   if(d.sekE===e && d.sekSuper && d.t-d.sekT<.35){
     const q=(d.t-d.sekT)/.35;
     X.strokeStyle='rgba(121,217,172,'+(1-q)+')'; X.lineWidth=2;
