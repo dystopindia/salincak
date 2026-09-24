@@ -5,6 +5,7 @@ import { JOKER, satinAl } from '../oyun/joker.js';
 import { kayit, sahip, sakla } from '../cekirdek/kayit.js';
 import { gunTazele } from '../oyun/gunluk.js';
 import { efektKapat } from '../ciz/sonisleme.js';
+import { RESIM } from '../ciz/resimler.js';
 import { HEDEF, IZLER, hedefTamam, hedefSayisi, izAcik, seciliIz, izSec } from '../oyun/hedef.js';
 import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi } from '../cekirdek/ses.js';
 
@@ -12,10 +13,27 @@ export function goster(...ler){ ler.forEach(x=>x.classList.remove('gizli')); }
 export function gizle (...ler){ ler.forEach(x=>x.classList.add('gizli')); }
 
 // Karakter seçme kartları — KAR listesinden üretiliyor, HTML'de sabit yok.
+// Portre oyundaki atlasın kendisi (ciz/resimler.js), 'otur' pozu CSS arka
+// planıyla kırpılıyor: ikinci bir resim dosyası yok, tek dosyalık pakette de
+// aynı data URI'yi kullanıyor. Kırpma yüzdeyle — kutunun boyu CSS'te,
+// kısa ekran kuralı yalnız yüksekliği değiştiriyor. Resmi olmayan karakter
+// portresiz kalıyor (kart yine çalışıyor).
+function portre(id){
+  const r=RESIM[id]; if(!r) return '';
+  const P=Object.values(r.pozlar), p=r.pozlar.otur;
+  const W=Math.max(...P.map(q=>q.x+q.w)), H=Math.max(...P.map(q=>q.y+q.h));
+  const yuzde=(a,b)=> b>0 ? (a/b*100).toFixed(3)+'%' : '0%';
+  return '<i class="por" style="background-image:url(&quot;'+r.dosya+'&quot;);'+
+    'background-size:'+(W/p.w*100).toFixed(3)+'% '+(H/p.h*100).toFixed(3)+'%;'+
+    'background-position:'+yuzde(p.x,W-p.w)+' '+yuzde(p.y,H-p.h)+';'+
+    'aspect-ratio:'+p.w+'/'+p.h+';opacity:'+r.alfa+'"></i>';
+}
+
 export function kimlikKur(){
   KAR.forEach((k,i)=>{
     const b=document.createElement('button');
-    b.innerHTML='<b>'+k.ad+'</b><span>'+k.not+'</span>';
+    b.innerHTML=portre(k.id)+'<b>'+k.ad+'</b><span>'+k.not+'</span>';
+    if(RESIM[k.id]) b.className='resimli';
     b.onclick=()=>{ durum.secKar=i; tikSesi();
       [...E.kimlik.children].forEach((c,j)=>c.classList.toggle('sec', j===i)); };
     E.kimlik.appendChild(b);

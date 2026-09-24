@@ -138,6 +138,14 @@ h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
 .kim button.sec{border-color:var(--lamba);background:rgba(242,179,61,.14)}
 .kim b{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
 .kim span{font-size:11.5px;line-height:1.4;color:#9C9AC4}
+/* Portre: oyundaki atlasın 'otur' pozu (ekranlar.portre). Solda, iki satırı
+   kaplıyor; seçili olmayan kart hafif sönük — seçim yazıdan önce resimden
+   okunuyor. Genişlik aspect-ratio'dan geliyor, burada yalnız yükseklik. */
+.kim button.resimli{display:grid;grid-template-columns:auto 1fr;
+  grid-template-rows:auto 1fr;column-gap:9px;align-items:start}
+.kim .por{grid-row:1/3;height:54px;align-self:center;background-repeat:no-repeat;
+  filter:saturate(.55) brightness(.8);transition:filter .2s,transform .2s}
+.kim button.sec .por{filter:none;transform:translateY(-2px)}
 .basla{width:100%;padding:15px;border:none;border-radius:13px;background:var(--lamba);
   color:#231903;font:inherit;font-size:16px;font-weight:700}
 .ikili{display:flex;gap:9px;margin-top:9px}
@@ -249,6 +257,10 @@ h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
   .kim{grid-template-columns:repeat(4,1fr);gap:6px}
   .kim button{padding:8px 6px;text-align:center}
   .kim b{font-size:12px;margin-bottom:0} .kim span{display:none}
+  /* portre adın solunda, küçük: satır yalnız ~12 px uzuyor */
+  .kim button.resimli{grid-template-rows:auto;column-gap:5px;align-items:center;
+    justify-content:center}
+  .kim .por{grid-row:auto;height:30px}
   .sekme{margin-top:9px;gap:6px} .dgm{padding:6px 11px;font-size:12px}
   .panel{margin-top:9px;padding:8px}
   .dukkan{gap:5px}
