@@ -35,7 +35,8 @@ export function salincakGerek(d,n){
 
 export function kur(tohum,karIdx){
   const r=rng(th32(tohum)), k=KAR[karIdx];
-  const d={ tohum, r, k, karIdx, faz:'salinim', i:0, sal:[],
+  // engel: parkur blokları/trambolinleri (oyun/engel.js); sonsuz modda boş.
+  const d={ tohum, r, k, karIdx, faz:'salinim', i:0, sal:[], engel:[],
     skor:0, mesafe:0, enUzak:0, t:0, sars:0, ogret:0,
     // adimNo: fizik adım sayacı, hayalet kaydının zaman birimi (§10).
     // giris: bu turun basış kaydı; akis.basla dolduruyor, öğreticide null.

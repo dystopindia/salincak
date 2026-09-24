@@ -12,5 +12,6 @@ export const durum = {
   sonTohum: 'ruya',
   sonSkor: 0,
   secKar: 0,
-  gunlukMu: false     // son tur günün turu muydu ('Tekrar dene' bunu koruyor)
+  gunlukMu: false,    // son tur günün turu muydu ('Tekrar dene' bunu koruyor)
+  sonDers: ''         // son biten ders: 'ogretici' | 'parkur' (bitiş ekranı düğmesi)
 };

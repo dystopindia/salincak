@@ -1,6 +1,7 @@
 import { durum } from './durum.js';
 import { kur } from './dunya.js';
 import { ogreticiKur, ogreticiDus } from './ogretici.js';
+import { parkurKur } from './parkur.js';
 import { kayit, kazan, sakla, sahip } from '../cekirdek/kayit.js';
 import { canHarca } from './joker.js';
 import { hayaletBasla, hayaletTemizle, hayaletSakla } from './hayalet.js';
@@ -62,9 +63,16 @@ export function baslaTus(){
   else ogreticiBasla();
 }
 
-export function ogreticiBasla(){
+export function ogreticiBasla(){ dersBasla(ogreticiKur(durum.secKar), 'öğreticiyi geç'); }
+
+// Deneme parkuru (oyun/parkur.js): öğreticiyle aynı altyapı — ölüm yok,
+// skor yok, altyazılı. Bitince kayit.ogretici'ye dokunmuyor.
+export function parkurBasla(){ dersBasla(parkurKur(durum.secKar), 'parkuru bırak'); }
+
+function dersBasla(d, gecYazi){
   surekliIptal(); muzikHazirla(); hayaletTemizle();
-  durum.D=ogreticiKur(durum.secKar); durum.hal='oyun';
+  durum.D=d; durum.hal='oyun';
+  E.bOgretGec.textContent=gecYazi;
   E.hud.classList.add('ogretici');
   gizle(E.menu, E.son, E.ogretBitti); goster(E.hud);
 }
@@ -72,11 +80,24 @@ export function ogreticiBasla(){
 // Tamamlandı ya da geçildi: bir daha kendiliğinden açılmıyor, menüden
 // istenirse yine oynanabiliyor.
 export function ogreticiBitir(gecildi){
-  kayit.ogretici=true; sakla();
+  const parkur = durum.D && durum.D.ogretici && durum.D.ogretici.ders.ad==='parkur';
+  durum.sonDers = parkur ? 'parkur' : 'ogretici';
+  if(!parkur){ kayit.ogretici=true; sakla(); }
   durum.hal='son';
   gicirtiGuncelle(0);
   if(gecildi){ menuyeDon(); return; }
   tikSesi();
+  if(parkur){
+    const n=durum.D.ogretici.dusme;
+    E.oBaslik.textContent='Parkur bitti.';
+    E.oMetin.textContent = (n ? n+' kez düştün. ' : 'Hiç düşmeden! ')+
+      'Bu bir deneme: blok, basamak ve trambolin nasıl hissettirdi?';
+    E.bOgretBasla.textContent='Tekrar dene';
+  } else {
+    E.oBaslik.textContent='Hazırsın.';
+    E.oMetin.textContent='Bundan sonrası gerçek: park bitene kadar bir salıncaktan diğerine. Zincir çubuğuna göz kulak ol.';
+    E.bOgretBasla.textContent='Sallanmaya başla';
+  }
   gizle(E.hud); goster(E.ogretBitti);
 }
 

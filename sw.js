@@ -1,6 +1,6 @@
 // derle.py tarafindan uretildi — elle duzenleme, derlemede uzerine yazilir.
 // Dosya listesi derle.py'deki SIRA'dan turetiliyor.
-const SURUM = 'salincak-278b335e9a';
+const SURUM = 'salincak-cee44348b9';
 const DOSYALAR = [
   './',
   'index.html',
@@ -30,6 +30,8 @@ const DOSYALAR = [
   'js/oyun/hedef.js',
   'js/oyun/girdi.js',
   'js/oyun/vitrin.js',
+  'js/oyun/engel.js',
+  'js/oyun/parkur.js',
   'js/ciz/zaman.js',
   'js/ciz/katmanlar.js',
   'js/ciz/gokyuzu.js',
@@ -45,6 +47,7 @@ const DOSYALAR = [
   'js/ciz/seri.js',
   'js/ciz/ruzgar.js',
   'js/ciz/iz.js',
+  'js/ciz/engel.js',
   'js/ciz/rotus.js',
   'js/ciz/sahne.js',
   'js/ciz/sonisleme.js',

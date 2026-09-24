@@ -7,7 +7,6 @@ import { kayit, sahip } from '../cekirdek/kayit.js';
 import { hayalet } from '../oyun/hayalet.js';
 import { gicirtiGuncelle } from '../cekirdek/ses.js';
 import { durum } from '../oyun/durum.js';
-import { ADIMLAR, ogreticiAdim } from '../oyun/ogretici.js';
 
 const SURELI = JOKER.filter(j => j.sure);
 let dugme = null;
@@ -88,9 +87,9 @@ export function hudG(d){
   // Öğretici altyazısı: adım durumdan türüyor (bkz. oyun/ogretici.js),
   // burada yalnız yazılıyor. Metin değişince kısa bir belirme animasyonu.
   if(d.ogretici){
-    const a=ogreticiAdim(d), m=ADIMLAR[a].metin;
+    const D=d.ogretici.ders, a=D.adim(d), m=D.adimlar[a].metin;
     if(E.hOgretMetin.textContent!==m){
-      E.hOgretMetin.textContent=m; E.hOgretNo.textContent=(a+1)+'/'+ADIMLAR.length;
+      E.hOgretMetin.textContent=m; E.hOgretNo.textContent=(a+1)+'/'+D.adimlar.length;
       E.hOgret.classList.remove('belir'); void E.hOgret.offsetWidth; E.hOgret.classList.add('belir');
     }
   }

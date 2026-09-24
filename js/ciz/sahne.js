@@ -16,6 +16,7 @@ import { uzuv } from './uzuv.js';
 import { paraCiz, paraPop, irtifaPop } from './para.js';
 import { seriCiz } from './seri.js';
 import { izCiz } from './iz.js';
+import { engelCiz } from './engel.js';
 import { ruzgarCiz } from './ruzgar.js';
 import { parcaciklarCiz, gunEvresi } from './zaman.js';
 import { vinyet, gren } from './rotus.js';
@@ -61,6 +62,8 @@ export function ciz(d, dt=1/60){
     iskelet(s, j===d.i, gece);
     zincirCiz(s, j===d.i && d.faz==='salinim', elAraligi(d.k));
   }
+
+  engelCiz(d, bz, gece);   // parkur blokları/trambolinler — oyun düzleminde
 
   isiklar(d,bz);     // 'lighter' — altındaki her şeyi aydınlatıyor
   paraCiz(d);        // ışıktan sonra: havuz altında kalırsa yıkanıp kayboluyor
@@ -111,6 +114,12 @@ export function ciz(d, dt=1/60){
     // Verlet atkı/kuyruk yalnız kod çiziminde: resimli karakterin atkısı
     // resmin içinde, ikinci bir atkı çizmek iki atkı demek.
     if(!spriteVar(d.k)) uzuv(d,dt,o.sx,o.sy,-s.th,yer(d),ruzg(d));   // karakterden SONRA, yoksa gövdenin altında kalıyor
+  } else if(d.faz==='kosu'){
+    // Koşu: resimde koşu pozu henüz yok — 'ayakta' pozu adım ritminde
+    // hafifçe sekiyor ve öne eğiliyor. Pivot ayak tabanı, d.py de öyle.
+    const q=ekr(p.x,p.y), adimF=d.t*d.vx*2.2;
+    const sek=Math.abs(Math.sin(adimF))*2.2, egim=.10+Math.sin(adimF*2)*.03;
+    karakter(q.sx,q.sy-sek,egim,'ayakta',d.k,kenarIsik(d,p.x,p.y+.5));
   } else {
     const q=ekr(p.x,p.y);
     if(d.uzanma>0){
@@ -184,5 +193,9 @@ function hayaletCiz(d){
 // çiziminde uzanma ayrı bir poz değil, eskisi gibi takla atmaya devam.
 function ucusPozu(d){ return d.uzanma>0 ? 'uzan' : 'ucus'; }
 function ucusAcisi(d, poz){
-  return poz==='uzan' && spriteVar(d.k) ? Math.atan2(-d.vy, d.vx) : d.don;
+  if(poz==='uzan' && spriteVar(d.k)) return Math.atan2(-d.vy, d.vx);
+  // Bloktan zıplayış kısa bir sekme: takla değil, hafif eğilme. Takla
+  // salıncaktan ve trambolinden fırlayınca (d.kaynak, oyun/engel.js).
+  if(d.kaynak==='blok') return kis(-d.vy*.03, -.25, .25) + .08;
+  return d.don;
 }

@@ -1,6 +1,6 @@
 import { durum } from './durum.js';
 import { bildir, pompaUygula, atlaUygula } from './fizik.js';
-import { basla, baslaTus, gunlukBasla, rastgeleTohum, ogreticiBasla, ogreticiBitir, menuyeDon, devamEt, duraklatVer, surdur } from './akis.js';
+import { basla, baslaTus, gunlukBasla, rastgeleTohum, ogreticiBasla, ogreticiBitir, parkurBasla, menuyeDon, devamEt, duraklatVer, surdur } from './akis.js';
 import { pompaSesi } from '../cekirdek/ses.js';
 import { kaydet } from './hayalet.js';
 import { K } from '../cekirdek/tuval.js';
@@ -14,7 +14,9 @@ import * as E from '../cekirdek/dom.js';
 // sessizce, bu katmandan hiç geçmeden uyguluyor.
 export function pompala(){
   if(durum.hal!=='oyun' || !durum.D) return;
-  const d=durum.D, q=pompaUygula(d);
+  const d=durum.D;
+  if(d.faz==='kosu'){ atlaTus(); return; }   // boşluk tuşu koşarken zıplatır
+  const q=pompaUygula(d);
   if(q<0) return;                      // etkisiz basış: kaydedilmiyor
   d.ogret++;
   kaydet(d,0);
@@ -52,7 +54,8 @@ export function baglaGirdi(){
   // bilinçli bir eylem (düğme / J) — tasarımın özü o.
   K.addEventListener('pointerdown', e=>{
     e.preventDefault();
-    if(durum.D && durum.hal==='oyun' && durum.D.faz==='ucus') atlaTus();
+    // Koşarken de dokunuş = zıpla (oyun/engel.js): koşuda pompa anlamsız.
+    if(durum.D && durum.hal==='oyun' && (durum.D.faz==='ucus'||durum.D.faz==='kosu')) atlaTus();
     else pompala();
   });
   E.bAtla.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); atlaTus(); });
@@ -69,6 +72,10 @@ export function baglaGirdi(){
   E.bOgretici.onclick     = ogreticiBasla;
   E.bGunluk.onclick       = gunlukBasla;
   E.bOgretGec.onclick     = e=>{ e.stopPropagation(); ogreticiBitir(true); };
-  E.bOgretBasla.onclick   = ()=> basla(rastgeleTohum(), durum.secKar, false);
+  E.bParkur.onclick       = parkurBasla;
+  // Bitiş ekranının ana düğmesi derse göre: öğreticiden sonra gerçek tur,
+  // parkurdan sonra parkuru yeniden dene.
+  E.bOgretBasla.onclick   = ()=> durum.sonDers==='parkur' ? parkurBasla()
+                                 : basla(rastgeleTohum(), durum.secKar, false);
   E.bOgretMenu.onclick    = menuyeDon;
 }

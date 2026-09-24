@@ -5,6 +5,7 @@ import { bitir } from './akis.js';
 import { paraTopla } from './para.js';
 import { tutunSesi, paraSesi, olumSesi, seriSesi, kopmaHissi } from '../cekirdek/ses.js';
 import { aktif, jokerAdim } from './joker.js';
+import { kosuAdim, ucusEngel, engelDokun, yolEngel } from './engel.js';
 
 // θ: düşey aşağıdan sapma. θ=0 asılı duruş.
 export const oturX = s => s.x + s.L*Math.sin(s.th);
@@ -155,10 +156,18 @@ export function atlaUygula(d){
     s.poz='cokuk';
     // Kumarın bedeli burada kilitleniyor: bırakılan zincirin yorgunluğu.
     // Havada düşersen bu değer de gidiyor — ödül ancak tutunursan ödeniyor.
-    d.atlamaYorgun=s.yorgun; d.ucusT=d.t;
+    d.atlamaYorgun=s.yorgun; d.ucusT=d.t; d.kaynak='sal';
     return true;
   }
-  if(d.faz==='ucus'){ d.uzanma=.38; return true; }
+  // Koşu ve uçuşta engel kuralları önce (oyun/engel.js): koşarken zıpla,
+  // kenardan yeni düştüysen zıpla, trambolinde süper sekme. Hiçbiri değilse
+  // uçuştaki dokunuş eskisi gibi uzanma. Engelsiz dünyada (sonsuz mod)
+  // bu dal hiç girilmiyor — davranış ve hayalet kayıtları aynı.
+  if(d.faz==='kosu') return engelDokun(d);
+  if(d.faz==='ucus'){
+    if(d.engel.length && engelDokun(d)) return true;
+    d.uzanma=.38; return true;
+  }
   return false;
 }
 
@@ -166,9 +175,10 @@ export function atlaUygula(d){
 export function yorunge(d,adet){
   const s=d.sal[d.i], v=hizv(s), g=yer(d), yol=[];
   let x=oturX(s), y=oturY(s), vx=v.x, vy=v.y;
-  for(let i=0;i<adet;i++){ const dt=.05;
+  for(let i=0;i<adet;i++){ const dt=.05, ex=x, ey=y;
     vx+=ruzg(d)*.35*dt; vy-=g*dt; x+=vx*dt; y+=vy*dt;
-    yol.push({x,y}); if(y<0)break; }
+    yol.push({x,y}); if(y<0)break;
+    if(d.engel.length && yolEngel(d,x,y,ex,ey)) break; }
   return yol;
 }
 
@@ -284,7 +294,11 @@ export function adim(d,dt){
       d.faz='dusus'; d.sebep='bosluk'; return; }
     d.mesafe=Math.max(d.mesafe, oturX(s));
 
+  } else if(d.faz==='kosu'){
+    kosuAdim(d,dt);
+
   } else if(d.faz==='ucus'||d.faz==='dusus'){
+    const ex=d.px, ey=d.py;
     const su=.016*Math.hypot(d.vx,d.vy);
     d.vx += (ruzg(d)*.35 - d.vx*su)*dt;
     d.vy += (-g - d.vy*su)*dt;
@@ -292,6 +306,9 @@ export function adim(d,dt){
     d.don += (d.vx>=0?1:-1)*dt*3.2;
     d.mesafe=Math.max(d.mesafe,d.px);
     if(d.faz==='ucus' && yakala(d)) return;
+    // Bloklar ve trambolinler. Zincir koparken (dusus) bir bloğa düşmek de
+    // kurtarıyor — fiziksel olarak tutarlı olan bu.
+    if(d.engel.length && ucusEngel(d,ex,ey) && d.faz==='kosu') return;
     if(d.py<=0){ d.py=0; d.sars=1; if(!d.sebep) d.sebep='dusme'; olumSesi(); return bitir(d); }
   }
 }

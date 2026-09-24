@@ -34,7 +34,11 @@ export function ogreticiAdim(d){
 
 export const ogreticiBittiMi = d => d.i>=SAL.length-1;
 
-function salincak(t, onceki, r){
+// Ders: altyazılar + adım + bitiş. Öğretici ve deneme parkuru (oyun/parkur.js)
+// aynı altyapıyı kullanıyor — HUD, ölümsüzlük, bitiş ekranı ortak.
+export const OGRETICI = { ad:'ogretici', adimlar:ADIMLAR, adim:ogreticiAdim, bitti:ogreticiBittiMi };
+
+export function salincak(t, onceki, r){
   return {
     para: t.para ? paraUret(r, onceki, t.x, t.py, t.Lu) : [],
     x:t.x, py:t.py, Lu:t.Lu, Lk:t.Lu-LFARK, L:t.Lu,
@@ -48,13 +52,23 @@ export function ogreticiKur(karIdx){
   d.sal=[]; SAL.forEach((t,i)=> d.sal.push(salincak(t, d.sal[i-1], d.r)));
   d.sal[0].th=.62; d.sal[0].gen=.62;
   d.ruzgar=.4;                          // ders sırasında rüzgâr dikkat dağıtmasın
-  d.ogretici={ dusme:0 };
+  d.ogretici={ dusme:0, ders:OGRETICI };
   return d;
 }
 
 // Düşüş: akis.bitir yerine burası. Can jokerinin devamEt'iyle aynı
 // sıfırlama — ama bedava ve sınırsız.
 export function ogreticiDus(d){
+  // Parkurda son indiğin blok, son tutunduğun salıncaktan ilerideyse
+  // oradan devam (kontrol noktası): bütün bölümü baştan koşturmak cezalandırır.
+  const e=d.kontrol;
+  if(e && e.tip==='blok' && e.x0 > d.sal[d.i].x){
+    d.faz='kosu'; d.px=e.x0+.4; d.py=e.ust; d.vx=0; d.vy=0;
+    d.uzanma=0; d.seri=0; d.sars=0; d.kenarT=-9; d.tamponT=-9;
+    d.mesaj='düştün — bloktan devam'; d.mesajT=d.t; d.mesajRenk='#F2B33D';
+    d.sebep=''; d.ogretici.dusme++;
+    return;
+  }
   const s=d.sal[d.i];
   s.yorgun=0; s.poz='cokuk'; s.pompaT=-9; s.L=s.Lu;
   s.th=.55; s.om=0; s.gen=.55;

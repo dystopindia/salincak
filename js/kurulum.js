@@ -7,7 +7,13 @@ import { tikSesi } from './cekirdek/ses.js';
 
 // file:// ile açıldığında servis çalışanı yok (ve gerekmiyor: dosya zaten
 // yerelde). https ya da localhost şart — tarayıcı kuralı.
-if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+//
+// Yerel geliştirmede KAYIT YOK (?sw ile zorlanabilir): sw.js derlemede
+// üretiliyor ve ön belleği `ignoreSearch` ile arıyor — düzenlenen bir
+// modül, `?v=` eklense bile, son derlemedeki eski haliyle geliyordu.
+// Bir oturumda üç kez "düzelttim ama değişmedi" diye zaman yedi.
+const yerel = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) && !/[?&]sw\b/.test(location.search);
+if('serviceWorker' in navigator && location.protocol.startsWith('http') && !yerel){
   addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
 

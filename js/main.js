@@ -9,7 +9,6 @@ import { hudG } from './ui/hud.js';
 import { kimlikKur, dukkanKur, ayarlarKur } from './ui/ekranlar.js';
 import { kayit, yukle } from './cekirdek/kayit.js';
 import { aktif } from './oyun/joker.js';
-import { ogreticiBittiMi } from './oyun/ogretici.js';
 import { ogreticiBitir } from './oyun/akis.js';
 import { bolgeNo, ADIM } from './oyun/tanimlar.js';
 import { hayaletAdim } from './oyun/hayalet.js';
@@ -60,7 +59,7 @@ function dongu(su){
       // hedefBitis bakıyor.
       if(durum.hal==='oyun') hedefAdim(d);
       hudG(d);
-      if(d.ogretici && ogreticiBittiMi(d)) ogreticiBitir(false);
+      if(d.ogretici && d.ogretici.ders.bitti(d)) ogreticiBitir(false);
     }
     // 'duraklat' hâlinde çizim de duruyor — ekran son karede donuyor,
     // dondurulmuş bir karenin üstünde kamera/uzuvların akmaya devam etmesi
