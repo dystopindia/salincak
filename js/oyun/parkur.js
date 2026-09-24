@@ -13,8 +13,8 @@ import { salincak } from './ogretici.js';
 
 const P_SAL = [
   { x:0,    py:4.8, Lu:2.7 },
-  { x:49.0, py:5.4, Lu:2.6 },               // bloğun kenarından zıplayınca tutunulan
-  { x:55.5, py:4.9, Lu:2.7 },               // son boşluk: salıncaktan salıncağa
+  { x:47.0, py:5.4, Lu:2.6 },               // bloğun kenarından zıplayınca tutunulan
+  { x:53.5, py:4.9, Lu:2.7 },               // son boşluk: salıncaktan salıncağa
 ];
 
 // ust: üst yüzey yüksekliği (m); alt=0 → yerden yükselen sütun.
@@ -22,15 +22,17 @@ const P_SAL = [
 // tribünün hemen dibindeydi — kenardan zıplayan onu aşıp ölüyordu, yani
 // bir önceki adımda öğrettiğimiz hareket burada cezalandırılıyordu. Ölçüm
 // (bot, 1/240 adım): tepe bloğun HER yerinden zıplayış tramboline iniyor,
-// zıplamadan düşen önüne düşüyor.
+// zıplamadan düşen önüne düşüyor. Koşu 5.0 → 4.4 m/s yavaşlayınca
+// ("bir tık hızlı") atlayışlar ~%12 kısaldı; trambolin, sonraki blok ve
+// salıncaklar buna göre geri çekildi, pencereler yeniden ölçüldü.
 const P_ENGEL = [
   { tip:'blok', x0:4.9,  x1:12.0, ust:1.5, alt:0 },     // geniş, alçak: ~1.3 rad yeter
   { tip:'blok', x0:14.6, x1:19.0, ust:2.0, alt:0 },     // 2.6 m boşluk: zıpla
   { tip:'blok', x0:19.0, x1:20.2, ust:2.45, alt:0 },    // tribün: üç basamak,
   { tip:'blok', x0:20.2, x1:21.4, ust:2.9, alt:0 },     // her biri 0.45 m —
   { tip:'blok', x0:21.4, x1:24.0, ust:3.35, alt:0 },    // kendiliğinden çıkılır
-  { tip:'trambolin', x0:29.1, x1:32.6, ust:.75 },       // tepeden zıpla, sek
-  { tip:'blok', x0:35.0, x1:43.0, ust:2.2, alt:0 },     // normal de süper de buraya iner
+  { tip:'trambolin', x0:28.2, x1:31.6, ust:.75 },       // tepeden zıpla, sek
+  { tip:'blok', x0:33.8, x1:42.2, ust:2.2, alt:0 },     // normal de süper de buraya iner
 ];
 
 export const P_ADIMLAR = [
@@ -48,7 +50,7 @@ function parkurAdim(d){
   if(d.faz==='salinim') return 0;
   if(d.px<14) return 1;
   if(d.kaynak!=='trambolin' && d.px<26) return 2;
-  if(d.px<34.5) return 3;
+  if(d.px<33.5) return 3;
   return 4;
 }
 

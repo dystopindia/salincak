@@ -18,7 +18,7 @@
 // yüksek hızla inen o hızı taşıyor, sonra yavaşça taban hıza iniyor —
 // iyi sallanmanın ödülü blokta da sürüyor.
 export const AYAK = .55;          // gövde ortası ile ayak tabanı arası (m)
-const KOSU_HIZ = 5.0;             // taban koşu hızı (m/s)
+const KOSU_HIZ = 4.4;             // taban koşu hızı (m/s) — 5.0 oyuncuya "bir tık hızlı" geldi
 const KOSU_AZAMI = 8.5;           // inişte taşınabilecek en yüksek hız
 const KOSU_ASAGI = .9;            // fazla hızın sönümü (1/s)
 const ZIPLA = 6.3;                // zıplama dikey hızı: parkta ~2 m yükselir

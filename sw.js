@@ -1,6 +1,6 @@
 // derle.py tarafindan uretildi — elle duzenleme, derlemede uzerine yazilir.
 // Dosya listesi derle.py'deki SIRA'dan turetiliyor.
-const SURUM = 'salincak-cee44348b9';
+const SURUM = 'salincak-cc41b39e27';
 const DOSYALAR = [
   './',
   'index.html',
