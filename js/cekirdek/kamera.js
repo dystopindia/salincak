@@ -24,7 +24,9 @@ export let kamX=0, kamY=0;
 // Oyuncu ekranın ortasında değil, %34'ünde duruyor. İleriyi görmek geriyi
 // görmekten çok daha önemli: arkada yalnız üstünde durduğun salıncağı
 // görmen yeterli (~3 m), ileride ise bir sonrakini görmen şart (13.5 m).
-const ODAK = .34;
+let ODAK = .34;
+// Menü vitrini (oyun/vitrin.js) odağı sola alıyor: kartın yanındaki boşluğa.
+export function odakKur(o){ ODAK = o; }
 
 export const ekr = (x,y) => ({
   sx: W*ODAK + (x-kamX)*PM,
@@ -45,6 +47,9 @@ export const KATMAN = { uzak:.15, orta:.45, on:1.3 };
 export const dunya = (sx,sy) => ({ x: kamX + (sx-W*ODAK)/PM, y: kamY + (H*.78-sy)/PM });
 
 // Kamera hedefi yumuşak takip eder; dikeyde 4 m'ye kadar hiç kıpırdamaz.
+// Takipsiz yerleştirme: menüye dönünce kamera 500 m geriye süpürülmesin.
+export function kameraAt(x,y){ kamX = x; kamY = Math.max(0,y-4.0); }
+
 export function izle(x,y){
   kamX += (x-kamX)*.10;
   kamY += (Math.max(0,y-4.0)-kamY)*.07;

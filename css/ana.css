@@ -121,6 +121,13 @@ body.efekt #c{opacity:0}
           max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
   background:radial-gradient(120% 90% at 50% 18%,rgba(42,42,94,.88),rgba(14,18,48,.97))}
 .kart{width:min(430px,100%);text-align:center;padding:8px 0 20px}
+/* Menü perdesi ortada koyu bir sütun, iki yanı açık: arkada vitrin
+   sallanıyor (oyun/vitrin.js — kart genişliği orada da 430). Sütunun
+   kenarı 30 px'te yumuşuyor; kart yazısı hep koyu zeminde kalıyor. */
+#menu{background:
+  radial-gradient(120% 90% at 50% 18%,rgba(42,42,94,.5),rgba(14,18,48,0) 70%),
+  linear-gradient(90deg,rgba(12,14,40,.18) calc(50% - 250px),rgba(14,18,48,.9) calc(50% - 220px),
+    rgba(14,18,48,.9) calc(50% + 220px),rgba(12,14,40,.18) calc(50% + 250px))}
 h1{font-family:Georgia,serif;font-weight:400;font-style:italic;
   font-size:clamp(40px,11vw,62px);line-height:.95;letter-spacing:-.02em;color:var(--lamba)}
 .alt{margin:10px auto 18px;max-width:33ch;font-size:14px;line-height:1.55;color:#B9B6DA}

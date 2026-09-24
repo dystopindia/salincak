@@ -1,5 +1,6 @@
 import { X, W, sakin } from '../cekirdek/tuval.js';
-import { ekr, izle, kamX, PM, olcek } from '../cekirdek/kamera.js';
+import { ekr, izle, kamX, PM, olcek, odakKur } from '../cekirdek/kamera.js';
+import { vitrinOdak } from '../oyun/vitrin.js';
 import { kis, renkA } from '../cekirdek/matematik.js';
 import { bolgeNo, BOL } from '../oyun/tanimlar.js';
 import { oturX, oturY, yorunge, tutunmaR, yer, ruzg } from '../oyun/fizik.js';
@@ -24,7 +25,10 @@ export function ciz(d, dt=1/60){
   const p = d.faz==='salinim'
     ? { x:oturX(d.sal[d.i]), y:oturY(d.sal[d.i]) }
     : { x:d.px, y:d.py };
-  izle(p.x, p.y);
+  // Menü vitrini: kamera salıncağın pivotunda sabit (oturakla sallanırsa
+  // bütün park sallanıyor), odak kartın solundaki boşlukta.
+  odakKur(d.vitrin ? vitrinOdak() : .34);
+  izle(d.vitrin ? d.sal[0].x : p.x, p.y);
 
   // bölge karışımı: mevcut salıncaktan sonrakine olan yol boyunca
   const s0=d.sal[d.i], s1=d.sal[d.i+1]||s0;
@@ -49,8 +53,11 @@ export function ciz(d, dt=1/60){
   // görünürdeki salıncaklar
   for(let j=Math.max(0,d.i-2); j<d.sal.length; j++){
     const s=d.sal[j];
-    if(s.x < kamX-W/(PM*2)-4) continue;
-    if(s.x > kamX+W/(PM*2)+4) break;
+    // Ekran kenarına göre, kamX±W/2'ye göre değil: odak her zaman ortada
+    // değil (oyunda %34, menü vitrininde sol boşluk — oyun/vitrin.js).
+    const q=ekr(s.x,0).sx;
+    if(q < -4*PM) continue;
+    if(q > W+4*PM) break;
     iskelet(s, j===d.i, gece);
     zincirCiz(s, j===d.i && d.faz==='salinim', elAraligi(d.k));
   }
@@ -61,7 +68,8 @@ export function ciz(d, dt=1/60){
   hayaletCiz(d);     // rekor hayaleti — oyuncunun ARKASINDA, soluk
 
   // hedef halkası: bir sonraki oturağın tutunma yarıçapı
-  if(d.faz==='ucus'||d.faz==='salinim'){
+  // Vitrinde oyun işaretleri yok: halka, dip göstergesi, yörünge, yazılar.
+  if(!d.vitrin && (d.faz==='ucus'||d.faz==='salinim')){
     const h=d.sal[d.i+1];
     if(h){
       const q=ekr(oturX(h),oturY(h)), R=tutunmaR(d)*PM;
@@ -78,6 +86,7 @@ export function ciz(d, dt=1/60){
     const s=d.sal[d.i];
 
     // dip bölgesi: "burada bas" göstergesi, yaklaştıkça parlar
+    if(!d.vitrin){
     const yakin=1-Math.min(1,Math.abs(s.th)/Math.max(.2,s.gen));
     const R=(s.Lu+s.Lk)/2, ac=Math.min(.42,Math.max(.16,s.gen*.36));
     X.beginPath();
@@ -95,6 +104,7 @@ export function ciz(d, dt=1/60){
     X.setLineDash([2,7]); X.strokeStyle='rgba(233,229,242,.35)'; X.lineWidth=1.5;
     X.beginPath(); yol.forEach((q,i)=>{const e=ekr(q.x,q.y); i?X.lineTo(e.sx,e.sy):X.moveTo(e.sx,e.sy);});
     X.stroke(); X.setLineDash([]);
+    }
 
     const o=ekr(oturX(s),oturY(s));
     karakter(o.sx,o.sy,-s.th,s.poz==='ayakta'?'ayakta':'otur',d.k,kenarIsik(d,oturX(s),oturY(s)));

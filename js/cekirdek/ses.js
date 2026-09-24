@@ -29,6 +29,23 @@ function baglam(){
 }
 
 export function acikMi(){ return !sessiz; }
+
+// --- titreşim --------------------------------------------------------
+// Sesle aynı dosyada, çünkü aynı `bastir` anahtarına bağlı olmalı: hayalet
+// turu tutunurken telefon titremesin. Sesten BAĞIMSIZ açılıp kapanıyor —
+// sesi kapalı oynayan için titreşim tek geri bildirim. iOS tarayıcıları
+// vibrate'i hiç desteklemiyor; ayar satırı orada gizleniyor (ekranlar.js).
+let tAcik = true;
+export const titresimVar = () => typeof navigator!=='undefined' && 'vibrate' in navigator;
+export function titresimAc(ac){ tAcik = ac; }
+export function titresimAcikMi(){ return tAcik; }
+function titret(desen){
+  if(!tAcik || bastir || !titresimVar()) return;
+  try{ navigator.vibrate(desen); }catch(e){}
+}
+// Zincir koptu: tutunmanın tersi, iki sert vuruş. Sesi yok (düşüş sürüyor,
+// ölüm sesi yere değince), yalnız his.
+export function kopmaHissi(){ titret([45,35,70]); }
 export function sesiKapat(kapali){ sessiz = kapali; if(kapali && ctx) gicirtiGuncelle(0); }
 
 // Tek bir ton: hızlı atak, üstel sönüm. gecikme ile art arda notalar
@@ -56,6 +73,7 @@ export function pompaSesi(q){
 // Tutunma: iki nota. Bonuslu yakalayışta (uzanarak / birden fazla salıncak)
 // ikinci nota daha yüksek — kulakla da "büyük yakalayış" fark edilsin.
 export function tutunSesi(bonuslu){
+  titret(bonuslu ? [14,45,22] : 16);      // bonuslu yakalayış çift vuruş
   const c=baglam(); if(!c) return;
   ton(c, 640, .08, 'sine', .13, 0);
   ton(c, bonuslu?1020:840, .13, 'sine', .12, .045);
@@ -70,6 +88,7 @@ export function paraSesi(){
 
 // Ölüm: alçalan kayma, uzun sönüm.
 export function olumSesi(){
+  titret(110);
   const c=baglam(); if(!c) return;
   ton(c, 200, .55, 'sawtooth', .11, 0, 50);
 }
@@ -114,7 +133,13 @@ function gicirtiKur(c){
   gOsc.start();
 }
 
+// Çubuk kırmızıya girince (HUD'ın .75 eşiği, fizik.TEMKIN_SINIR) bir kez
+// çift tık — sürekli vızıltı değil, "sınırdasın" uyarısı. Sesten önce:
+// ses kapalıyken de çalışsın.
+let gOnceki = 0;
 export function gicirtiGuncelle(k){
+  if(k>=.75 && gOnceki<.75) titret([9,70,9]);
+  gOnceki = k;
   const c=baglam(); if(!c){ return; }
   if(!gOsc) gicirtiKur(c);
   const hedef = k>.6 ? (k-.6)/.4*.045 : 0;

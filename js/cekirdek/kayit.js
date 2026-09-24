@@ -11,6 +11,7 @@ export const kayit = {
   rekor: 0,
   ses: true,         // ayarlar panelindeki anahtar buradan kalıcı
   muzik: true,       // arka plan müziği (efektlerden ayrı kapatılabilir)
+  titresim: true,    // tutunma/kopma/ölümde telefon titreşimi (Android; iOS'ta yok)
   surekli: false,    // ölünce otomatik yeniden başlasın mı (Geometry Dash tarzı)
   ogretici: false,   // öğretici bir kez tamamlandı ya da geçildi mi
   hayaletAcik: true, // rekor hayaleti gösterilsin mi (ayarlar anahtarı)
@@ -50,6 +51,7 @@ export function yukle(){
     if(typeof o.rekor === 'number') kayit.rekor = Math.max(0, o.rekor|0);
     if(typeof o.ses === 'boolean')  kayit.ses   = o.ses;
     if(typeof o.muzik === 'boolean') kayit.muzik = o.muzik;
+    if(typeof o.titresim === 'boolean') kayit.titresim = o.titresim;
     if(typeof o.surekli === 'boolean') kayit.surekli = o.surekli;
     if(typeof o.ogretici === 'boolean') kayit.ogretici = o.ogretici;
     if(typeof o.hayaletAcik === 'boolean') kayit.hayaletAcik = o.hayaletAcik;

@@ -59,7 +59,8 @@ export function zemin(d,b){
     }
   }
 
-  // 10 m'de bir mesafe cetveli
+  // 10 m'de bir mesafe cetveli — menü vitrininde yok, orada yol alınmıyor
+  if(d.vitrin) return;
   X.fillStyle='rgba(233,229,242,.26)'; X.font='10px system-ui';
   const bas=Math.floor((kamX-16)/10)*10;
   for(let m=bas;m<kamX+20;m+=10){

@@ -7,7 +7,7 @@ import { gunTazele } from '../oyun/gunluk.js';
 import { efektKapat } from '../ciz/sonisleme.js';
 import { RESIM } from '../ciz/resimler.js';
 import { HEDEF, IZLER, hedefTamam, hedefSayisi, izAcik, seciliIz, izSec } from '../oyun/hedef.js';
-import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi } from '../cekirdek/ses.js';
+import { tikSesi, acikMi, sesiKapat, muzikAc, muzikAcikMi, titresimVar, titresimAc, titresimAcikMi } from '../cekirdek/ses.js';
 
 export function goster(...ler){ ler.forEach(x=>x.classList.remove('gizli')); }
 export function gizle (...ler){ ler.forEach(x=>x.classList.add('gizli')); }
@@ -126,6 +126,8 @@ export function ayarlarKur(){
       b.setAttribute('aria-pressed', acikMi()?'true':'false'));
     document.querySelectorAll('[data-muzik]').forEach(b=>
       b.setAttribute('aria-pressed', muzikAcikMi()?'true':'false'));
+    document.querySelectorAll('[data-titresim]').forEach(b=>
+      b.setAttribute('aria-pressed', titresimAcikMi()?'true':'false'));
     document.querySelectorAll('[data-surekli]').forEach(b=>
       b.setAttribute('aria-pressed', kayit.surekli?'true':'false'));
     document.querySelectorAll('[data-hayalet]').forEach(b=>
@@ -144,6 +146,16 @@ export function ayarlarKur(){
     b.onclick=()=>{
       const ac = !muzikAcikMi();
       muzikAc(ac); kayit.muzik=ac; sakla(); yansit(); tikSesi();
+    };
+  });
+  // Titreşim: desteklemeyen tarayıcıda (iOS) satır hiç görünmüyor —
+  // işe yaramayan bir anahtar bozuk gibi durur. Açınca kısa bir onay vuruşu.
+  document.querySelectorAll('[data-titresim-satir]').forEach(r=>{ if(!titresimVar()) r.remove(); });
+  document.querySelectorAll('[data-titresim]').forEach(b=>{
+    b.onclick=()=>{
+      const ac = !titresimAcikMi();
+      titresimAc(ac); kayit.titresim=ac; sakla(); yansit(); tikSesi();
+      if(ac) try{ navigator.vibrate(20); }catch(e){}
     };
   });
   document.querySelectorAll('[data-surekli]').forEach(b=>{

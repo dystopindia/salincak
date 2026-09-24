@@ -14,20 +14,31 @@ import { ogreticiBitir } from './oyun/akis.js';
 import { bolgeNo, ADIM } from './oyun/tanimlar.js';
 import { hayaletAdim } from './oyun/hayalet.js';
 import { hedefAdim } from './oyun/hedef.js';
-import { sesiKapat, muzikAc, muzikAdim } from './cekirdek/ses.js';
+import { vitrinAdim } from './oyun/vitrin.js';
+import { kameraAt } from './cekirdek/kamera.js';
+import { sesiKapat, muzikAc, muzikAdim, titresimAc } from './cekirdek/ses.js';
 
 // ADIM (fizik adımı, 1/240) oyun/tanimlar.js'te: hayalet kaydı da onu
 // zaman birimi olarak kullanıyor, tek kaynak olmalı.
 const AZAMI = .05;       // sekme sonrası dev dt'yi yut
 
-let onceki = performance.now(), bir = 0;
+let onceki = performance.now(), bir = 0, sonHal = '';
 
 function dongu(su){
   const dt = Math.min(AZAMI, (su-onceki)/1000);
   onceki = su;
 
+  // Menüde eski tur değil vitrin çiziliyor (oyun/vitrin.js): seçili
+  // karakter parkta sallanıyor. Menüye girerken kamera oraya ATLIYOR.
+  if(durum.hal==='menu'){
+    const v = vitrinAdim(dt);
+    if(sonHal!=='menu') kameraAt(v.sal[0].x, 0);
+    ciz(v, dt); sonIsle(v);
+  }
+  sonHal = durum.hal;
+
   const d = durum.D;
-  if(d){
+  if(d && durum.hal!=='menu'){
     if(durum.hal==='oyun'){
       // İki bağımsız kaynak zamanı yavaşlatabilir: Odak jokeri (süreli,
       // oyuncunun seçimi) ve yakalama-anı yavaşlaması (otomatik, kısa).
@@ -70,6 +81,7 @@ window.salincak = durum;
 yukle();
 sesiKapat(!kayit.ses);          // kalıcı tercih burada uygulanıyor
 muzikAc(kayit.muzik);
+titresimAc(kayit.titresim);
 kimlikKur();
 dukkanKur();
 ayarlarKur();

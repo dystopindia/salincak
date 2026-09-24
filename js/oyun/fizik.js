@@ -3,7 +3,7 @@ import { BOL, bolgeNo, LFARK, LHIZ0, SLACK } from './tanimlar.js';
 import { salincakGerek } from './dunya.js';
 import { bitir } from './akis.js';
 import { paraTopla } from './para.js';
-import { tutunSesi, paraSesi, olumSesi, seriSesi } from '../cekirdek/ses.js';
+import { tutunSesi, paraSesi, olumSesi, seriSesi, kopmaHissi } from '../cekirdek/ses.js';
 import { aktif, jokerAdim } from './joker.js';
 
 // θ: düşey aşağıdan sapma. θ=0 asılı duruş.
@@ -279,7 +279,7 @@ export function adim(d,dt){
     const T=g*Math.cos(s.th)+s.L*s.om*s.om;
     if(T>s.dayanim && !aktif(d,'zincir')) s.yorgun += (T-s.dayanim)*dt*.14/d.k.zincir;
     if(s.yorgun>=1){ d.sars=1; d.px=oturX(s); d.py=oturY(s);
-      const v=hizv(s); d.vx=v.x; d.vy=v.y; d.faz='dusus'; d.sebep='kopma'; return; }
+      const v=hizv(s); d.vx=v.x; d.vy=v.y; d.faz='dusus'; d.sebep='kopma'; kopmaHissi(); return; }
     if(Math.abs(s.th)>SLACK){ d.px=oturX(s); d.py=oturY(s); d.vx=0; d.vy=0;
       d.faz='dusus'; d.sebep='bosluk'; return; }
     d.mesafe=Math.max(d.mesafe, oturX(s));
