@@ -4,13 +4,13 @@
 // buradan geçiyor; ox/oy: pozun dönme noktası, atlas px.
 export const RESIM = {
   cocuk: { dosya:'resim/cocuk.webp', depo:2.25, el:11.2, alfa:1,
-    pozlar:{ otur:{x:0,y:0,w:75,h:101,ox:42.6,oy:84.5}, ayakta:{x:77,y:0,w:75,h:115,ox:44.4,oy:112.5}, ucus:{x:154,y:0,w:79,h:96,ox:45.7,oy:52.3}, uzan:{x:235,y:0,w:93,h:107,ox:41.8,oy:55.2}, kosu1:{x:330,y:0,w:82,h:107,ox:52.0,oy:107.3}, kosu2:{x:414,y:0,w:84,h:101,ox:53.8,oy:101.0}, kosu3:{x:500,y:0,w:84,h:107,ox:54.8,oy:106.5}, kosu4:{x:586,y:0,w:84,h:106,ox:53.9,oy:105.6}, zipla:{x:672,y:0,w:99,h:111,ox:54.7,oy:55.4}, inis:{x:773,y:0,w:100,h:102,ox:59.0,oy:101.5} } },
+    pozlar:{ otur:{x:0,y:0,w:75,h:101,ox:42.6,oy:84.5}, ayakta:{x:77,y:0,w:75,h:115,ox:44.4,oy:112.5}, ucus:{x:154,y:0,w:79,h:96,ox:45.7,oy:52.3}, uzan:{x:235,y:0,w:93,h:107,ox:41.8,oy:55.2}, kosu1:{x:330,y:0,w:81,h:107,ox:51.6,oy:107.0}, kosu2:{x:413,y:0,w:84,h:101,ox:53.5,oy:100.7}, kosu3:{x:499,y:0,w:84,h:107,ox:54.5,oy:106.5}, kosu4:{x:585,y:0,w:83,h:105,ox:53.8,oy:105.1}, zipla:{x:670,y:0,w:99,h:111,ox:54.6,oy:55.4}, inis:{x:771,y:0,w:100,h:101,ox:59.0,oy:101.2} } },
   kedi: { dosya:'resim/kedi.webp', depo:2.25, el:12.0, alfa:1,
-    pozlar:{ otur:{x:0,y:0,w:81,h:95,ox:47.1,oy:83.0}, ayakta:{x:83,y:0,w:80,h:105,ox:46.3,oy:103.9}, ucus:{x:165,y:0,w:73,h:89,ox:44.0,oy:48.7}, uzan:{x:240,y:0,w:96,h:98,ox:52.5,oy:50.7} } },
+    pozlar:{ otur:{x:0,y:0,w:81,h:95,ox:47.1,oy:83.0}, ayakta:{x:83,y:0,w:80,h:105,ox:46.3,oy:103.9}, ucus:{x:165,y:0,w:73,h:89,ox:44.0,oy:48.7}, uzan:{x:240,y:0,w:96,h:98,ox:52.5,oy:50.7}, kosu1:{x:338,y:0,w:95,h:97,ox:62.0,oy:96.5}, kosu2:{x:435,y:0,w:90,h:92,ox:60.7,oy:92.2}, kosu3:{x:527,y:0,w:96,h:95,ox:61.5,oy:95.2}, kosu4:{x:625,y:0,w:92,h:94,ox:61.8,oy:93.4}, zipla:{x:719,y:0,w:101,h:94,ox:61.3,oy:46.9}, inis:{x:822,y:0,w:102,h:85,ox:69.0,oy:84.7} } },
   astronot: { dosya:'resim/astronot.webp', depo:2.25, el:12.1, alfa:1,
-    pozlar:{ otur:{x:0,y:0,w:75,h:103,ox:41.0,oy:82.4}, ayakta:{x:77,y:0,w:70,h:111,ox:37.8,oy:110.3}, ucus:{x:149,y:0,w:72,h:95,ox:41.2,oy:53.7}, uzan:{x:223,y:0,w:92,h:103,ox:46.9,oy:53.7} } },
+    pozlar:{ otur:{x:0,y:0,w:75,h:103,ox:41.0,oy:82.4}, ayakta:{x:77,y:0,w:70,h:111,ox:37.8,oy:110.3}, ucus:{x:149,y:0,w:72,h:95,ox:41.2,oy:53.7}, uzan:{x:223,y:0,w:92,h:103,ox:46.9,oy:53.7}, kosu1:{x:317,y:0,w:75,h:100,ox:43.1,oy:99.7}, kosu2:{x:394,y:0,w:71,h:99,ox:40.5,oy:98.5}, kosu3:{x:467,y:0,w:74,h:100,ox:43.1,oy:99.9}, kosu4:{x:543,y:0,w:73,h:101,ox:42.9,oy:101.1}, zipla:{x:618,y:0,w:95,h:91,ox:53.4,oy:45.4}, inis:{x:715,y:0,w:93,h:93,ox:50.7,oy:93.0} } },
   hayalet: { dosya:'resim/hayalet.webp', depo:2.25, el:12.0, alfa:0.82,
-    pozlar:{ otur:{x:0,y:0,w:71,h:94,ox:38.2,oy:87.3}, ayakta:{x:73,y:0,w:69,h:100,ox:35.6,oy:97.6}, ucus:{x:144,y:0,w:60,h:90,ox:30.5,oy:46.7}, uzan:{x:206,y:0,w:90,h:93,ox:40.4,oy:48.5} } }
+    pozlar:{ otur:{x:0,y:0,w:71,h:94,ox:38.2,oy:87.3}, ayakta:{x:73,y:0,w:69,h:100,ox:35.6,oy:97.6}, ucus:{x:144,y:0,w:60,h:90,ox:30.5,oy:46.7}, uzan:{x:206,y:0,w:90,h:93,ox:40.4,oy:48.5}, kosu1:{x:298,y:0,w:80,h:89,ox:51.7,oy:89.0}, kosu2:{x:380,y:0,w:79,h:91,ox:50.7,oy:90.6}, kosu3:{x:461,y:0,w:82,h:88,ox:54.3,oy:87.9}, kosu4:{x:545,y:0,w:84,h:89,ox:55.7,oy:88.3}, zipla:{x:631,y:0,w:74,h:103,ox:34.6,oy:51.5}, inis:{x:707,y:0,w:100,h:69,ox:55.3,oy:68.5} } }
 };
 
 // Salıncak iskeletleri, BOL sırasıyla. px/py: pivot (zincirlerin asıldığı
@@ -37,7 +37,19 @@ export const BOYALI = {
 // uç parçaların genişliği; pxm: atlas px / dünya metresi. tramb: dinlenen ve
 // basılmış hâl, aynı tabanda; ust: sekme yüzeyinin tepeden uzaklığı.
 export const PARKUR_RESIM = {
-  0: { dosya:'resim/park-parkur.webp', pxm:87.1,
-    blok:{x:0,y:0,w:679,h:103,kapak:39.2,sol:26.4,sag:26.8,alt:7.7},
-    tramb:[{x:0,y:105,w:321,h:110},{x:323,y:105,w:321,h:110}], ust:14.3 }
+  0: { dosya:'resim/park-parkur.webp', pxm:79.1,
+    blok:{x:0,y:0,w:679,h:103,kapak:39.2,sol:26.4,sag:26.8,alt:7.7,yuzey:3.6},
+    tramb:[{x:0,y:105,w:321,h:110},{x:323,y:105,w:321,h:110}], ust:16.6 },
+  1: { dosya:'resim/orman-parkur.webp', pxm:81.8,
+    blok:{x:0,y:0,w:601,h:118,kapak:59.6,sol:90.4,sag:90.4,alt:7.0,yuzey:22.8},
+    tramb:[{x:0,y:120,w:250,h:166},{x:252,y:120,w:250,h:166}], ust:5.0 },
+  2: { dosya:'resim/bulutlar-parkur.webp', pxm:126.2,
+    blok:{x:0,y:0,w:664,h:122,kapak:62.4,sol:83.2,sag:83.2,alt:7.1,yuzey:5.6},
+    tramb:[{x:0,y:124,w:238,h:100},{x:240,y:124,w:238,h:100}], ust:8.0 },
+  3: { dosya:'resim/yorunge-parkur.webp', pxm:68.4,
+    blok:{x:0,y:0,w:639,h:106,kapak:37.2,sol:67.2,sag:64.8,alt:8.3,yuzey:6.4},
+    tramb:[{x:0,y:108,w:234,h:100},{x:236,y:108,w:234,h:100}], ust:20.1 },
+  4: { dosya:'resim/buz-parkur.webp', pxm:92.4,
+    blok:{x:0,y:0,w:655,h:135,kapak:60.8,sol:52.0,sag:52.4,alt:8.9,yuzey:19.2},
+    tramb:[{x:0,y:137,w:279,h:131},{x:281,y:137,w:279,h:131}], ust:24.1 }
 };

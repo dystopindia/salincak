@@ -39,6 +39,10 @@ for(const b in PARKUR_RESIM){
 // bir boşluk parlıyor.
 function blokResim(kaynak, R, x, y, w, h){
   const B = R.blok, s = PM / R.pxm;
+  // Basılan yüzey resmin tepesi değil (sprite.py, yuzey): uçlardaki süsler
+  // — buz kristali, orman yaprağı — onun üstüne taşıyor. Resim o kadar
+  // yukarıdan başlıyor ki yüzey tam e.ust'e otursun.
+  const yz = (B.yuzey||0)*s; y -= yz; h += yz;
   let sol = B.sol*s, sag = B.sag*s;
   if(sol+sag > w){ const k = w/(sol+sag); sol*=k; sag*=k; }
   const kap = Math.min(B.kapak*s, h), altH = Math.min(B.alt*s, Math.max(0, h-kap));
@@ -71,8 +75,13 @@ function trambolinResim(kaynak, R, d, e){
   const T = R.tramb[bas];
   const sx = (e.x1-e.x0)*PM / T.w;
   const sy = Math.max(e.ust*PM / (T.h - R.ust), sx*.85);
-  const q = ekr(e.x0, e.ust);
+  const q = ekr(e.x0, e.ust), yer = ekr(e.x0, 0).sy;
+  // Yerin altına düşen kısım kırpılıyor: ormanın mantarı fizikteki
+  // trambolinden (3.4 × .75 m) çok daha uzun — şapkası yerden çıkıyor.
+  X.save();
+  X.beginPath(); X.rect(q.sx - T.w*sx, yer - 4000, T.w*sx*3, 4000); X.clip();
   X.drawImage(kaynak, T.x, T.y, T.w, T.h, q.sx, q.sy - R.ust*sy, T.w*sx, T.h*sy);
+  X.restore();
 }
 
 function resimliCiz(d, R, e, gece){
