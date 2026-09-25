@@ -42,6 +42,7 @@ export function vitrin(){
     V.mesafe = 60;             // akşamüstü: ilk görüntü fenerlerin yandığı saat
     V.ruzgar = .5;             // otlar hafif sallanıyor, rüzgâr çizgisi yok
     V.sal.length = 2;
+    V.engel = [];              // üretimde parça gelmiş olabilir; vitrinde yok
     for(const s of V.sal) s.para = [];
   }
   return V;

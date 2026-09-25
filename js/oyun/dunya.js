@@ -1,6 +1,7 @@
 import { rng, th32 } from '../cekirdek/matematik.js';
 import { KAR, bolgeNo, LFARK } from './tanimlar.js';
 import { paraUret } from './para.js';
+import { parcaMi, parcaUret } from './parca.js';
 
 // Salıncaklar tembel üretilir: oyuncu ilerledikçe listeye eklenir.
 // Üretim yalnızca d.r'yi (tohumlu rng) kullanır, yani sıra deterministik.
@@ -10,16 +11,27 @@ export function salincakUret(d,i){
   // ("düşük g'de menzil uzar" varsayımıyla) ama sarkaçtan fırlatmada menzil
   // g'den bağımsız: v² ∝ g, menzil ∝ v²/g. Sonuç yörüngede 11.8 m'lik,
   // ~2.9 rad (SLACK sınırı) isteyen, fiilen geçilemez bir ilk boşluktu.
-  const acilim=Math.min(9.4, 5.0+i*.34+r()*1.4);
+  let acilim=Math.min(9.4, 5.0+i*.34+r()*1.4);
   const onceki=d.sal[i-1];
   const Lu=2.45+r()*.5;
-  const x = onceki ? onceki.x+acilim : 0;
   const py = 4.4+r()*1.0;
-  // Paralar bu salıncağa GİDEN boşlukta. Aynı r() akışından geliyorlar,
-  // yani tohum aynıysa para dizilimi de aynı.
-  const para = paraUret(r, onceki, x, py, Lu);
+  // Parkur parçası (oyun/parca.js): bu boşluğa bloklar/trambolin giriyorsa
+  // salıncağın yeri parçanın son bloğundan hesaplanıyor. Aynı r() akışı —
+  // tohum aynıysa parçalar da aynı. py/Lu x'ten ÖNCE çekiliyor çünkü
+  // parça, oturağın yüksekliğine göre salıncağı yerleştiriyor.
+  let x, para, parca = false;
+  if(parcaMi(d, i, onceki, r)){
+    const p = parcaUret(d, i, onceki, py, Lu, r);
+    d.engel.push(...p.engel);
+    x = p.x; acilim = x - onceki.x; para = p.para; parca = true;
+  } else {
+    x = onceki ? onceki.x+acilim : 0;
+    // Paralar bu salıncağa GİDEN boşlukta. Aynı r() akışından geliyorlar,
+    // yani tohum aynıysa para dizilimi de aynı.
+    para = paraUret(r, onceki, x, py, Lu);
+  }
   return {
-    para, x,
+    para, x, parca,
     py,
     Lu, Lk: Lu-LFARK, L: Lu,
     dayanim: 34-Math.min(4,i*.2)+r()*2,

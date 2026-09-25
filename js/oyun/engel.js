@@ -4,8 +4,19 @@
 // Engel verisi d.engel dizisinde, x'e göre sıralı:
 //   { tip:'blok',      x0, x1, ust, alt }   alt=0 → yerden yükselen sütun
 //   { tip:'trambolin', x0, x1, ust }        bacakları yere ya da bloğa basar
-// Sonsuz modda dizi boş — o yüzden normal oyunun fiziği hiç değişmedi ve
-// hayalet kayıtları (FIZIK_SURUM) geçerli kaldı.
+// Deneme parkurunda elle (oyun/parkur.js), sonsuz modda parça üreticisinden
+// (oyun/parca.js) geliyor. Parçasız dünyada dizi boş ve buradaki her dal
+// ona bağlı — salınım/uçuş fiziği parçalar yüzünden değişmedi.
+//
+// Liste uzun turda büyüyor (her parça 1-7 engel). Döngüler baştan değil
+// `d.engelIlk`'ten başlıyor: oyuncunun 25 m gerisinde kalanlar atlanıyor.
+// Durum fizikte (d), çizim de aynı işaretçiyi kullanıyor.
+export function engelIlk(d){
+  let i = d.engelIlk || 0;
+  while(i < d.engel.length && d.engel[i].x1 < d.px - 25) i++;
+  d.engelIlk = i;
+  return i;
+}
 //
 // Konum kuralı: koşarken d.py AYAK tabanı (bloğun üstü), uçarken GÖVDE
 // ortası (salıncaktan fırlayınca olduğu gibi). Geçişte AYAK kadar kaydırılıyor;
@@ -18,10 +29,13 @@
 // yüksek hızla inen o hızı taşıyor, sonra yavaşça taban hıza iniyor —
 // iyi sallanmanın ödülü blokta da sürüyor.
 export const AYAK = .55;          // gövde ortası ile ayak tabanı arası (m)
-const KOSU_HIZ = 4.4;             // taban koşu hızı (m/s) — 5.0 oyuncuya "bir tık hızlı" geldi
-const KOSU_AZAMI = 8.5;           // inişte taşınabilecek en yüksek hız
-const KOSU_ASAGI = .9;            // fazla hızın sönümü (1/s)
-const ZIPLA = 6.3;                // zıplama dikey hızı: parkta ~2 m yükselir
+export const KOSU_HIZ = 4.4;             // taban koşu hızı (m/s) — 5.0 oyuncuya "bir tık hızlı" geldi
+// İnişte taşınan hız sınırlı ve çabuk sönüyor: ilk sürüm 8.5 / .9 idi,
+// salıncaktan hızlı inip kısa blokta hemen zıplayan bir sonraki bloğu
+// aşıyordu (yörüngede, sonsuz modun ölçümünde). Ödül kalıyor, savrulma azalıyor.
+export const KOSU_AZAMI = 6.5;    // inişte taşınabilecek en yüksek hız
+const KOSU_ASAGI = 1.8;           // fazla hızın sönümü (1/s)
+export const ZIPLA = 6.3;                // zıplama dikey hızı: parkta ~2 m yükselir
 const EN = .18;                   // gövde yarı genişliği (çarpışma)
 
 // Affetme payları (Celeste, Super Mario Run). Görünmezler ama hissedilirler:
@@ -38,13 +52,17 @@ const SEKME = .92;                // geri verilen hız oranı
 const SEKME_EN_AZ = 7.5;          // yavaş düşse bile en az bu kadar fırlatır
 const SUPER = 1.22;               // zamanlı dokunuşun çarpanı
 const SUPER_SONRA = .10;          // değdikten sonra da bu kadar süre geçerli
+// Sekmeden sonra yatay hız en az bu: trambolin yönü koruyor (Mario'nun
+// yayları gibi). Bulutlarda karşı rüzgâr sekmeyi GERİYE çeviriyordu —
+// yatay 1.9 m/s ile kalkan karakter −2.5'le trambolinin gerisine düştü.
+export const SEKME_VX = 3.5;
 
 const blokMu = e => e.tip==='blok';
 
 // x'te ayak altındaki en yüksek blok üstü (yukarıdan en fazla `tavan`a kadar).
 function ayakAlti(d, x, tavan){
   let en=null;
-  for(const e of d.engel){
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){ const e=d.engel[j];
     if(e.x0 > x+EN) break;
     if(!blokMu(e) || e.x1 < x-EN || e.ust > tavan) continue;
     if(!en || e.ust > en.ust) en=e;
@@ -72,7 +90,7 @@ export function kosuAdim(d, dt){
   d.vx += (KOSU_HIZ - d.vx) * Math.min(1, dt*(d.vx>KOSU_HIZ ? KOSU_ASAGI : 3));
   const x0=d.px, x1=d.px+d.vx*dt;
   // duvar: önündeki blok basamaktan yüksekse
-  for(const e of d.engel){
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){ const e=d.engel[j];
     if(e.x0 > x1+EN) break;
     if(blokMu(e) && e.x0 >= x0+EN-1e-6 && e.x0 <= x1+EN && e.ust > d.py+BASAMAK && e.alt < d.py+1.2){
       d.px=e.x0-EN; d.vx=0; return;
@@ -89,7 +107,7 @@ export function kosuAdim(d, dt){
 // gövde ortası. Bir şeye değdiyse true.
 export function ucusEngel(d, ex, ey){
   const ayak=d.py-AYAK, eAyak=ey-AYAK;
-  for(const e of d.engel){
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){ const e=d.engel[j];
     if(e.x0 > d.px+EN+1) break;
     if(e.x1 < d.px-EN-1) continue;
     const icinde = d.px > e.x0-EN && d.px < e.x1+EN;
@@ -98,7 +116,7 @@ export function ucusEngel(d, ex, ey){
         let v=Math.max(-d.vy*SEKME, SEKME_EN_AZ);
         const zamanli = d.t-(d.tamponT??-9) < TAMPON;
         if(zamanli){ v*=SUPER; d.tamponT=-9; }
-        d.vy=v; d.py=e.ust+AYAK; d.sekT=d.t; d.sekE=e; d.sekSuper=zamanli;
+        d.vy=v; d.vx=Math.max(d.vx, SEKME_VX); d.py=e.ust+AYAK; d.sekT=d.t; d.sekE=e; d.sekSuper=zamanli;
         d.faz='ucus'; d.don=0; d.ucusT=d.t; d.kaynak='trambolin'; d.sebep='';
         return true;
       }
@@ -141,7 +159,7 @@ export function engelDokun(d){
 const YAKIN = 1.3;       // m — bu kadar yukarıdaki düşüşte dokunuş = tampon
 function yuzeyYakin(d){
   const ayak=d.py-AYAK;
-  for(const e of d.engel){
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){ const e=d.engel[j];
     if(e.x0 > d.px+1) break;
     if(e.x1 < d.px-1) continue;
     if(ayak>=e.ust && ayak-e.ust < YAKIN) return true;
@@ -151,7 +169,7 @@ function yuzeyYakin(d){
 
 // Noktalı "şimdi atlarsan" yolu bir engele değince orada bitsin.
 export function yolEngel(d, x, y, ex, ey){
-  for(const e of d.engel){
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){ const e=d.engel[j];
     if(e.x0 > x+EN) break;
     if(x < e.x0-EN || x > e.x1+EN) continue;
     const ust=e.ust+AYAK;

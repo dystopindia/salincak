@@ -58,7 +58,7 @@ export const ADIM = 1/240;
 // etkileyen her değişiklikte artır (skor kuralı değişikliği gerekmez:
 // geri oynatma skoru zaten yeniden hesaplıyor).
 //   1: ilk sürüm   2: tutunmada genlik enerjiden (fizik.genlik)
-export const FIZIK_SURUM = 2;
+export const FIZIK_SURUM = 3;     // 3: sonsuz modda parkur parçaları (dünya üretimi değişti)
 
 export const LFARK = .55;    // toplam ip boyu değişimi (m) — büyütme, oyun kontrolsüzleşir
 export const LHIZ0 = 1.35;   // L' üst sınırı (m/s) — ani L' pompalamayı patlatır

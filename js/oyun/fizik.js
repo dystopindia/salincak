@@ -5,7 +5,7 @@ import { bitir } from './akis.js';
 import { paraTopla } from './para.js';
 import { tutunSesi, paraSesi, olumSesi, seriSesi, kopmaHissi } from '../cekirdek/ses.js';
 import { aktif, jokerAdim } from './joker.js';
-import { kosuAdim, ucusEngel, engelDokun, yolEngel } from './engel.js';
+import { kosuAdim, ucusEngel, engelDokun, yolEngel, engelIlk } from './engel.js';
 
 // θ: düşey aşağıdan sapma. θ=0 asılı duruş.
 export const oturX = s => s.x + s.L*Math.sin(s.th);
@@ -295,6 +295,7 @@ export function adim(d,dt){
     d.mesafe=Math.max(d.mesafe, oturX(s));
 
   } else if(d.faz==='kosu'){
+    engelIlk(d);
     kosuAdim(d,dt);
 
   } else if(d.faz==='ucus'||d.faz==='dusus'){
@@ -308,7 +309,7 @@ export function adim(d,dt){
     if(d.faz==='ucus' && yakala(d)) return;
     // Bloklar ve trambolinler. Zincir koparken (dusus) bir bloğa düşmek de
     // kurtarıyor — fiziksel olarak tutarlı olan bu.
-    if(d.engel.length && ucusEngel(d,ex,ey) && d.faz==='kosu') return;
+    if(d.engel.length && (engelIlk(d), ucusEngel(d,ex,ey)) && d.faz==='kosu') return;
     if(d.py<=0){ d.py=0; d.sars=1; if(!d.sebep) d.sebep='dusme'; olumSesi(); return bitir(d); }
   }
 }

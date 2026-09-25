@@ -112,11 +112,14 @@ export function engelCiz(d, b, gece){
   const govde = renkKar(gRenk, BOL[b].on, gece*.5);
   const kapak = renkKar(kRenk, BOL[b].on, gece*.25);
   const kenar = BOL[b].on;
-  const R = PR[b] && PR[b].hazir ? PR[b] : null;
-  for(const e of d.engel){
+  // Her engel üretildiği bölgenin kostümünü giyiyor (e.bol — salıncak
+  // iskeletleri gibi, §6.16); deneme parkurunda bol yok, görünen bölge.
+  for(let j=d.engelIlk||0; j<d.engel.length; j++){
+    const e=d.engel[j];
     const a=ekr(e.x0, e.ust), z=ekr(e.x1, 0);
     if(z.sx < -20) continue;
     if(a.sx > W+20) break;
+    const eb = e.bol ?? b, R = PR[eb] && PR[eb].hazir ? PR[eb] : null;
     if(R) resimliCiz(d, R, e, gece);
     else if(e.tip==='blok') blok(e, a, z, govde, kapak, kenar);
     else trambolin(d, e, govde, kapak, kenar);
